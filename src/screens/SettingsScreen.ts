@@ -25,7 +25,7 @@ export function renderSettingsScreen(onStart: (settings: GameSettings) => void):
 
       <div class="settings-group">
         <div class="settings-group__label">
-          <span class="settings-group__icon">🎨</span>
+          <img src="/images/icons/icon-theme.png" class="settings-group__icon" alt="" />
           <span>Game themes</span>
         </div>
         <div class="settings-group__options" id="theme-options">
@@ -40,7 +40,7 @@ export function renderSettingsScreen(onStart: (settings: GameSettings) => void):
 
       <div class="settings-group">
         <div class="settings-group__label">
-          <span class="settings-group__icon">🧑</span>
+          <img src="/images/icons/icon-player.png" class="settings-group__icon" alt="" />
           <span>Choose player</span>
         </div>
         <div class="settings-group__options" id="player-options">
@@ -55,7 +55,7 @@ export function renderSettingsScreen(onStart: (settings: GameSettings) => void):
 
       <div class="settings-group">
         <div class="settings-group__label">
-          <span class="settings-group__icon">📋</span>
+          <img src="/images/icons/icon-board.png" class="settings-group__icon" alt="" />
           <span>Board size</span>
         </div>
         <div class="settings-group__options" id="size-options">

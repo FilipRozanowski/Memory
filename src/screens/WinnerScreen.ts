@@ -9,24 +9,35 @@ export function renderWinnerScreen(state: GameState, onRestart: () => void): HTM
   const el = document.createElement('div');
   el.className = 'screen-winner';
 
-  el.innerHTML = `
-    <canvas class="screen-winner__confetti" id="confetti-canvas"></canvas>
-    <p class="screen-winner__label">The winner is</p>
-    <h1 class="screen-winner__name screen-winner__name--${isDraw ? 'blue' : winner}">
-      ${isDraw ? 'DRAW!' : `${winner.toUpperCase()} PLAYER`}
-    </h1>
-    <img
-      class="screen-winner__avatar"
-      src="/images/players/${isDraw ? 'draw' : winner}-avatar.svg"
-      alt="${isDraw ? 'draw' : winner} player avatar"
-    />
-    <button class="btn btn--secondary" id="btn-restart">Back to start</button>
-  `;
+  if (isDraw) {
+    el.innerHTML = `
+      <p class="screen-winner__label">It's a</p>
+      <h1 class="screen-winner__name screen-winner__name--draw">DRAW</h1>
+      <img
+        class="screen-winner__avatar"
+        src="/images/icons/player-draw.png"
+        alt="draw"
+      />
+      <button class="btn btn--secondary" id="btn-restart">Back to start</button>
+    `;
+  } else {
+    el.innerHTML = `
+      <canvas class="screen-winner__confetti" id="confetti-canvas"></canvas>
+      <p class="screen-winner__label">The winner is</p>
+      <h1 class="screen-winner__name screen-winner__name--${winner}">
+        ${winner.toUpperCase()} PLAYER
+      </h1>
+      <img
+        class="screen-winner__avatar"
+        src="/images/icons/player-${winner}.png"
+        alt="${winner} player"
+      />
+      <button class="btn btn--secondary" id="btn-restart">Back to start</button>
+    `;
+    startConfetti(el.querySelector<HTMLCanvasElement>('#confetti-canvas')!);
+  }
 
   el.querySelector('#btn-restart')!.addEventListener('click', onRestart);
-
-  if (!isDraw) startConfetti(el.querySelector<HTMLCanvasElement>('#confetti-canvas')!);
-
   return el;
 }
 
