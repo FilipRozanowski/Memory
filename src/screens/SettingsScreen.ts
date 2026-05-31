@@ -1,7 +1,7 @@
 import type { BoardSize, GameSettings, Player, Theme } from '../types';
 import { THEMES } from '../game/themes';
 
-const THEMES_LIST: Theme[] = ['code-vibes', 'gaming', 'da-projects', 'foods'];
+const THEMES_LIST: Theme[] = ['code-vibes', 'gaming'];
 const BOARD_SIZES: BoardSize[] = [16, 24, 36];
 
 export function renderSettingsScreen(onStart: (settings: GameSettings) => void): HTMLElement {
