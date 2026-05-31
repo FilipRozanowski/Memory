@@ -45,7 +45,7 @@ function buildHeader(state: GameState, isGaming: boolean): string {
       </div>
       <div class="game-header__current">
         Current player:
-        <span class="player-square" style="background:${curBg}"></span>
+        <span class="player-arrow" style="background:${curBg}"></span>
       </div>
       <button class="btn btn--exit" id="btn-exit">⏻ Exit game</button>
     </div>`;
