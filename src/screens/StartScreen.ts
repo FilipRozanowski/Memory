@@ -3,12 +3,14 @@ export function renderStartScreen(onPlay: () => void): HTMLElement {
   el.className = 'screen-start';
 
   el.innerHTML = `
-    <p class="screen-start__eyebrow">It's play time.</p>
-    <h1 class="screen-start__title">Ready to play?</h1>
-    <button class="btn btn--primary" id="btn-play">
-      <img src="/images/icons/icon-play.png" alt="" class="btn__icon" />
-      Play →
-    </button>
+    <div class="screen-start__content">
+      <p class="screen-start__eyebrow">It's play time.</p>
+      <h1 class="screen-start__title">Ready to play?</h1>
+      <button class="btn btn--primary" id="btn-play">
+        <img src="/images/icons/icon-play.png" alt="" class="btn__icon" />
+        Play →
+      </button>
+    </div>
     <img
       class="screen-start__decoration"
       src="/images/icons/decoration-controller.png"

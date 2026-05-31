@@ -3,13 +3,18 @@
 .screen-start {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  text-align: left;
   padding: $spacing-xl;
   position: relative;
   overflow: hidden;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
 
   &__eyebrow {
     font-size: 1.2rem;
@@ -25,8 +30,6 @@
   }
 
   .btn {
-    align-self: flex-start;
-    width: auto;
     font-size: 1.1rem;
     padding: 0.9rem 2rem;
   }
