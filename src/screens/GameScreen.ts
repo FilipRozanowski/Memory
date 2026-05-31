@@ -42,7 +42,7 @@ export function renderGameScreen(
             >
               <div class="card__inner">
                 <div class="card__back">
-                  <img src="/images/icons/card-back-icon.svg" alt="" />
+                  <img src="/images/icons/card-back.png" alt="" />
                 </div>
                 <div class="card__front">
                   <img src="${card.imageSrc}" alt="card" />
