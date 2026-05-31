@@ -24,10 +24,14 @@
 
   &__decoration {
     position: absolute;
-    bottom: -2rem;
-    left: -2rem;
-    opacity: 0.15;
-    width: 280px;
+    bottom: -3rem;
+    left: -3rem;
+    width: 340px;
     pointer-events: none;
+    transform: rotate(-15deg);
+    // Färbt das PNG in #F0EA6E um
+    filter: brightness(0) saturate(100%) invert(93%) sepia(30%) saturate(700%)
+      hue-rotate(338deg) brightness(105%) contrast(92%);
+    opacity: 0.25;
   }
 }

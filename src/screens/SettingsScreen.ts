@@ -21,11 +21,14 @@ export function renderSettingsScreen(onStart: (settings: GameSettings) => void):
 
   el.innerHTML = `
     <div class="screen-settings__left">
-      <h1 class="screen-settings__title">Settings</h1>
+      <div class="screen-settings__title-wrap">
+        <h1 class="screen-settings__title">Settings</h1>
+        <div class="screen-settings__title-line"></div>
+      </div>
 
       <div class="settings-group">
         <div class="settings-group__label">
-          <img src="/images/icons/icon-theme.png" class="settings-group__icon" alt="" />
+          <img src="/images/icons/icon-theme.png" class="settings-group__icon settings-group__icon--theme" alt="" />
           <span>Game themes</span>
         </div>
         <div class="settings-group__options" id="theme-options">
@@ -40,7 +43,7 @@ export function renderSettingsScreen(onStart: (settings: GameSettings) => void):
 
       <div class="settings-group">
         <div class="settings-group__label">
-          <img src="/images/icons/icon-player.png" class="settings-group__icon" alt="" />
+          <img src="/images/icons/icon-player.png" class="settings-group__icon settings-group__icon--player" alt="" />
           <span>Choose player</span>
         </div>
         <div class="settings-group__options" id="player-options">
@@ -55,7 +58,7 @@ export function renderSettingsScreen(onStart: (settings: GameSettings) => void):
 
       <div class="settings-group">
         <div class="settings-group__label">
-          <img src="/images/icons/icon-board.png" class="settings-group__icon" alt="" />
+          <img src="/images/icons/icon-board.png" class="settings-group__icon settings-group__icon--board" alt="" />
           <span>Board size</span>
         </div>
         <div class="settings-group__options" id="size-options">
