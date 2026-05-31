@@ -24,10 +24,12 @@ function buildHeader(state: GameState, isGaming: boolean): string {
             ${playerIcon('blue')} <span style="color:#4ab4e8;font-weight:700">${state.scores.blue}</span>
           </span>
         </div>
-        <div class="game-header__current">
-          Current player: ${playerIcon(cur, 20)}
+        <div class="game-header__bottom">
+          <div class="game-header__current">
+            Current player: ${playerIcon(cur, 20)}
+          </div>
+          <button class="btn btn--exit btn--exit-gaming" id="btn-exit">⏻ Exit game</button>
         </div>
-        <button class="btn btn--exit btn--exit-gaming" id="btn-exit">⏻ Exit game</button>
       </div>`;
   }
   const curBg = state.currentPlayer === 'blue' ? '#4ab4e8' : '#e8914a';
@@ -43,11 +45,13 @@ function buildHeader(state: GameState, isGaming: boolean): string {
           Orange ${state.scores.orange}
         </div>
       </div>
-      <div class="game-header__current">
-        Current player:
-        <span class="player-arrow" style="background:${curBg}"></span>
+      <div class="game-header__bottom">
+        <div class="game-header__current">
+          Current player:
+          <span class="player-arrow" style="background:${curBg}"></span>
+        </div>
+        <button class="btn btn--exit" id="btn-exit">⏻ Exit game</button>
       </div>
-      <button class="btn btn--exit" id="btn-exit">⏻ Exit game</button>
     </div>`;
 }
 
