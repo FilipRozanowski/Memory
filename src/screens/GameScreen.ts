@@ -17,11 +17,11 @@ function buildHeader(state: GameState, isGaming: boolean): string {
       <div class="game-header game-header--gaming">
         <div class="score-combined">
           <span class="score-combined__item">
-            ${playerIcon('orange')} ${state.scores.orange}
+            ${playerIcon('orange')} <span style="color:#e8914a;font-weight:700">${state.scores.orange}</span>
           </span>
           <span class="score-combined__divider"></span>
           <span class="score-combined__item">
-            ${playerIcon('blue')} ${state.scores.blue}
+            ${playerIcon('blue')} <span style="color:#4ab4e8;font-weight:700">${state.scores.blue}</span>
           </span>
         </div>
         <div class="game-header__current">
