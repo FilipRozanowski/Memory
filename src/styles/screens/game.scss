@@ -12,7 +12,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.1rem $spacing-md;
+  padding: 1.1rem $spacing-xl;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
 
   &__current {
     display: flex;
