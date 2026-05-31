@@ -35,11 +35,11 @@
 
     &--blue {
       color: $color-player-blue;
-      text-shadow: 3px 3px 0 darken(#4ab4e8, 25%);
+      text-shadow: 3px 3px 0 #2278a8;
     }
     &--orange {
       color: $color-player-orange;
-      text-shadow: 3px 3px 0 darken(#e8914a, 25%);
+      text-shadow: 3px 3px 0 #a85a1a;
     }
     &--draw {
       color: var(--color-gameover);
