@@ -9,24 +9,24 @@ export const THEMES: Record<Theme, ThemeConfig> = {
     name: 'code-vibes',
     label: 'Code vibes theme',
     previewImage: '/images/cards/code-vibes/preview.png',
-    cardImages: cardImages('code-vibes', 14),
+    cardImages: cardImages('code-vibes', 18),
   },
   gaming: {
     name: 'gaming',
     label: 'Gaming theme',
     previewImage: '/images/cards/gaming/preview.png',
-    cardImages: cardImages('gaming', 14),
+    cardImages: cardImages('gaming', 18),
   },
   'da-projects': {
     name: 'da-projects',
     label: 'DA Projects theme',
     previewImage: '/images/cards/da-projects/preview.png',
-    cardImages: cardImages('da-projects', 14),
+    cardImages: cardImages('da-projects', 18),
   },
   foods: {
     name: 'foods',
     label: 'Foods theme',
     previewImage: '/images/cards/foods/preview.png',
-    cardImages: cardImages('foods', 14),
+    cardImages: cardImages('foods', 18),
   },
 };
