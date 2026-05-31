@@ -6,7 +6,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: $spacing-md;
+  gap: $spacing-lg;
   position: relative;
   overflow: hidden;
 
@@ -19,22 +19,42 @@
   }
 
   &__label {
-    font-size: 1rem;
+    font-size: 1.2rem;
     color: $color-text-muted;
+    margin-bottom: -$spacing-sm;
   }
 
   &__name {
-    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-size: clamp(4rem, 10vw, 7rem);
     font-weight: 900;
     text-transform: uppercase;
+    line-height: 1;
 
-    &--blue { color: $color-player-blue; }
-    &--orange { color: $color-player-orange; }
+    &--blue {
+      color: $color-player-blue;
+      text-shadow:
+        4px 4px 0 darken(#4ab4e8, 25%),
+        -2px -2px 0 darken(#4ab4e8, 35%);
+    }
+
+    &--orange {
+      color: $color-player-orange;
+      text-shadow:
+        4px 4px 0 darken(#e8914a, 25%),
+        -2px -2px 0 darken(#e8914a, 35%);
+    }
+
+    &--draw {
+      color: $color-card-back;
+      text-shadow:
+        4px 4px 0 darken(#4ab8b0, 25%),
+        -2px -2px 0 darken(#4ab8b0, 35%);
+    }
   }
 
   &__avatar {
-    width: 120px;
-    height: 120px;
+    width: 160px;
+    height: 160px;
     object-fit: contain;
   }
 }
