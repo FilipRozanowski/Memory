@@ -19,7 +19,7 @@ export function renderWinnerScreen(state: GameState, onRestart: () => void): HTM
     el.innerHTML = `
       <p class="screen-winner__label">It's a</p>
       <h1 class="screen-winner__name screen-winner__name--draw">DRAW</h1>
-      <img class="screen-winner__avatar" src="/images/icons/player-draw.png" alt="draw" />
+      <img class="screen-winner__avatar" src="/images/icons/player-draw${isGaming ? '-gaming' : ''}.png" alt="draw" />
       <button class="btn btn--secondary" id="btn-restart">${isGaming ? 'Home' : 'Back to start'}</button>
     `;
   } else {
