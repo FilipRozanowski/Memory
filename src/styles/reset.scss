@@ -21,6 +21,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+#app {
+  font-family: var(--font-main);
+}
+
 button {
   cursor: pointer;
   border: none;
