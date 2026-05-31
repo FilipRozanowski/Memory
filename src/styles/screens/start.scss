@@ -22,6 +22,11 @@
     margin-bottom: $spacing-lg;
   }
 
+  .btn {
+    align-self: flex-start;
+    width: auto;
+  }
+
   &__decoration {
     position: absolute;
     bottom: -3rem;
