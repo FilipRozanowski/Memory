@@ -77,21 +77,26 @@ export function renderSettingsScreen(onStart: (settings: GameSettings) => void):
         <img src="${THEMES[settings.theme].previewImage}" alt="Theme preview" />
       </div>
       <div class="screen-settings__actions">
-        <span>Game theme</span>
+        <span id="summary-theme">${THEMES[settings.theme].label}</span>
         <span class="divider">/</span>
-        <span>Player</span>
+        <span id="summary-player">${settings.startingPlayer.charAt(0).toUpperCase() + settings.startingPlayer.slice(1)}</span>
         <span class="divider">/</span>
-        <span>Board size</span>
+        <span id="summary-size">${settings.boardSize} cards</span>
         <button class="btn btn--primary" id="btn-start">▶ Start</button>
       </div>
     </div>
   `;
+
+  const summaryTheme  = el.querySelector<HTMLElement>('#summary-theme')!;
+  const summaryPlayer = el.querySelector<HTMLElement>('#summary-player')!;
+  const summarySize   = el.querySelector<HTMLElement>('#summary-size')!;
 
   el.querySelectorAll<HTMLInputElement>('input[name="theme"]').forEach((input) => {
     input.addEventListener('change', () => {
       settings = { ...settings, theme: input.value as Theme };
       el.querySelectorAll('.radio-option').forEach((l) => l.classList.remove('is-selected'));
       input.closest('.radio-option')?.classList.add('is-selected');
+      summaryTheme.textContent = THEMES[settings.theme].label;
       updatePreview();
     });
   });
@@ -101,6 +106,7 @@ export function renderSettingsScreen(onStart: (settings: GameSettings) => void):
       settings = { ...settings, startingPlayer: input.value as Player };
       input.closest('.settings-group')?.querySelectorAll('.radio-option').forEach((l) => l.classList.remove('is-selected'));
       input.closest('.radio-option')?.classList.add('is-selected');
+      summaryPlayer.textContent = settings.startingPlayer.charAt(0).toUpperCase() + settings.startingPlayer.slice(1);
     });
   });
 
@@ -109,6 +115,7 @@ export function renderSettingsScreen(onStart: (settings: GameSettings) => void):
       settings = { ...settings, boardSize: Number(input.value) as BoardSize };
       input.closest('.settings-group')?.querySelectorAll('.radio-option').forEach((l) => l.classList.remove('is-selected'));
       input.closest('.radio-option')?.classList.add('is-selected');
+      summarySize.textContent = `${settings.boardSize} cards`;
     });
   });
 
