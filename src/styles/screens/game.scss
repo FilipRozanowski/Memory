@@ -37,21 +37,23 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  background-color: rgba(0, 0, 0, 0.35);
+  background-color: rgba(134, 233, 214, 0.2);
   padding: 0.4rem 0.9rem;
   border-radius: $radius-sm;
   font-weight: 700;
   font-size: 0.9rem;
   color: $color-text;
 
-  &__dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
+  &__arrow {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    clip-path: polygon(0% 15%, 0% 85%, 65% 85%, 100% 50%, 65% 15%);
+    flex-shrink: 0;
   }
 
-  &--blue .score-badge__dot  { background-color: $color-player-blue; }
-  &--orange .score-badge__dot { background-color: $color-player-orange; }
+  &--blue .score-badge__arrow  { background-color: $color-player-blue; }
+  &--orange .score-badge__arrow { background-color: $color-player-orange; }
 }
 
 .player-arrow {

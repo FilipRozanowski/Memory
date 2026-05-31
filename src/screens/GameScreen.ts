@@ -35,11 +35,11 @@ function buildHeader(state: GameState, isGaming: boolean): string {
     <div class="game-header game-header--code-vibes">
       <div class="game-header__scores">
         <div class="score-badge score-badge--blue">
-          <span class="score-badge__dot"></span>
+          <span class="score-badge__arrow"></span>
           Blue ${state.scores.blue}
         </div>
         <div class="score-badge score-badge--orange">
-          <span class="score-badge__dot"></span>
+          <span class="score-badge__arrow"></span>
           Orange ${state.scores.orange}
         </div>
       </div>
