@@ -1,0 +1,40 @@
+@use '../variables' as *;
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: 0.75rem 1.5rem;
+  border-radius: $radius-md;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: transform $transition-fast, opacity $transition-fast;
+
+  &:hover {
+    transform: scale(1.03);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &--primary {
+    background-color: $color-accent;
+    color: #1a1a1a;
+  }
+
+  &--secondary {
+    background-color: $color-bg-dark;
+    color: $color-text;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  &--ghost {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: $color-text;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+  }
+}
