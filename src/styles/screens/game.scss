@@ -52,6 +52,10 @@
   .game-header__scores {
     display: flex;
     gap: $spacing-sm;
+
+    @media (max-width: 750px) {
+      justify-content: center;
+    }
   }
 }
 
@@ -100,10 +104,10 @@
     margin: 0.4rem auto 0;
   }
 
-  // score-combined is full-width row on mobile
+  // score-combined centered on mobile
   .score-combined {
     @media (max-width: 750px) {
-      align-self: flex-start;
+      align-self: center;
     }
   }
 }
