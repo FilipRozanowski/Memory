@@ -61,25 +61,19 @@
     justify-content: center;
     gap: $spacing-md;
     padding: $spacing-xl;
-    background-color: #f5f5f5;
   }
 
   &__preview {
     width: 100%;
     max-width: 340px;
-    background-color: $color-bg;
     border-radius: $radius-lg;
-    padding: $spacing-sm;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 230px;
+    overflow: hidden;
 
     img {
-      max-height: 190px;
-      max-width: 100%;
-      object-fit: contain;
-      border-radius: $radius-md;
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: $radius-lg;
     }
   }
 
