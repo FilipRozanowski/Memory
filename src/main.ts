@@ -9,12 +9,17 @@ import { renderWinnerScreen } from './screens/WinnerScreen';
 
 const app = document.getElementById('app')!;
 
+function setTheme(theme: string) {
+  app.dataset.theme = theme;
+}
+
 function show(el: HTMLElement) {
   app.innerHTML = '';
   app.appendChild(el);
 }
 
 function goToStart() {
+  setTheme('default');
   show(renderStartScreen(goToSettings));
 }
 
@@ -23,6 +28,7 @@ function goToSettings() {
 }
 
 function goToGame(settings: GameSettings) {
+  setTheme(settings.theme);
   const state = createInitialState(settings);
   show(renderGameScreen(state, goToGameOver, goToStart));
 }

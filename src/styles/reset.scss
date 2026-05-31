@@ -15,7 +15,7 @@ body {
 
 body {
   font-family: $font-primary;
-  background-color: $color-bg;
+  background-color: var(--color-bg);
   color: $color-text;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;

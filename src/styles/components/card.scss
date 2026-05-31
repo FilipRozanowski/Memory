@@ -28,7 +28,7 @@
     position: absolute;
     inset: 0;
     backface-visibility: hidden;
-    border-radius: $radius-lg;
+    border-radius: var(--card-radius);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -36,8 +36,7 @@
   }
 
   &__back {
-    background-color: $color-card-back;
-    overflow: hidden;
+    background-color: var(--color-card-back);
 
     img {
       width: 100%;

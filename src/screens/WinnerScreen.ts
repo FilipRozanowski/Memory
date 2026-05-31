@@ -5,6 +5,12 @@ export function renderWinnerScreen(state: GameState, onRestart: () => void): HTM
   const result = getWinner(state);
   const isDraw = result === 'draw';
   const winner = result as Player;
+  const isGaming = state.settings.theme === 'gaming';
+
+  // Gaming theme uses trophy for winner, same scale for draw
+  const winnerAvatar = isGaming
+    ? `/images/icons/trophy.png`
+    : `/images/icons/player-${winner}.png`;
 
   const el = document.createElement('div');
   el.className = 'screen-winner';
@@ -13,26 +19,18 @@ export function renderWinnerScreen(state: GameState, onRestart: () => void): HTM
     el.innerHTML = `
       <p class="screen-winner__label">It's a</p>
       <h1 class="screen-winner__name screen-winner__name--draw">DRAW</h1>
-      <img
-        class="screen-winner__avatar"
-        src="/images/icons/player-draw.png"
-        alt="draw"
-      />
-      <button class="btn btn--secondary" id="btn-restart">Back to start</button>
+      <img class="screen-winner__avatar" src="/images/icons/player-draw.png" alt="draw" />
+      <button class="btn btn--secondary" id="btn-restart">${isGaming ? 'Home' : 'Back to start'}</button>
     `;
   } else {
     el.innerHTML = `
       <canvas class="screen-winner__confetti" id="confetti-canvas"></canvas>
       <p class="screen-winner__label">The winner is</p>
       <h1 class="screen-winner__name screen-winner__name--${winner}">
-        ${winner.toUpperCase()} PLAYER
+        ${isGaming ? winner.charAt(0).toUpperCase() + winner.slice(1) + ' Player' : winner.toUpperCase() + ' PLAYER'}
       </h1>
-      <img
-        class="screen-winner__avatar"
-        src="/images/icons/player-${winner}.png"
-        alt="${winner} player"
-      />
-      <button class="btn btn--secondary" id="btn-restart">Back to start</button>
+      <img class="screen-winner__avatar" src="${winnerAvatar}" alt="${winner} player" />
+      <button class="btn btn--secondary" id="btn-restart">${isGaming ? 'Home' : 'Back to start'}</button>
     `;
     startConfetti(el.querySelector<HTMLCanvasElement>('#confetti-canvas')!);
   }

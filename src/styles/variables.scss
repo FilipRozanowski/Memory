@@ -1,4 +1,32 @@
-// Colors
+// Default theme CSS custom properties (Code Vibes)
+:root {
+  --color-bg: #3a3a3a;
+  --color-bg-dark: #2e2e2e;
+  --color-accent: #d4e84a;
+  --color-card-back: #4ab8b0;
+  --color-card-back-img: url('/images/icons/card-back.png');
+  --color-gameover: #4ab8b0;
+  --gameover-shadow-1: #2d7a76;
+  --gameover-shadow-2: #1d5a56;
+  --font-gameover: inherit;
+  --card-radius: 12px;
+}
+
+// Gaming theme
+[data-theme='gaming'] {
+  --color-bg: #2a4a5e;
+  --color-bg-dark: #1e3a4e;
+  --color-accent: #e8006e;
+  --color-card-back: #e8006e;
+  --color-card-back-img: url('/images/cards/gaming/card-back.png');
+  --color-gameover: #e8006e;
+  --gameover-shadow-1: #a00050;
+  --gameover-shadow-2: #700038;
+  --font-gameover: 'Courier New', monospace;
+  --card-radius: 8px;
+}
+
+// SCSS variables (used where CSS vars can't be used, e.g. media queries)
 $color-bg: #3a3a3a;
 $color-bg-dark: #2e2e2e;
 $color-accent: #d4e84a;
@@ -8,32 +36,26 @@ $color-card-back: #4ab8b0;
 $color-text: #ffffff;
 $color-text-muted: rgba(255, 255, 255, 0.6);
 
-// Typography
 $font-primary: 'Nunito', system-ui, sans-serif;
 
-// Spacing
 $spacing-xs: 0.5rem;
 $spacing-sm: 1rem;
 $spacing-md: 1.5rem;
 $spacing-lg: 2rem;
 $spacing-xl: 3rem;
 
-// Breakpoints
 $bp-sm: 480px;
 $bp-md: 768px;
 $bp-lg: 1024px;
 
-// Card sizes
 $card-size-sm: 80px;
 $card-size-md: 110px;
 $card-size-lg: 140px;
 
-// Transitions
 $transition-fast: 150ms ease;
 $transition-normal: 300ms ease;
 $transition-flip: 500ms ease;
 
-// Border radius
 $radius-sm: 4px;
 $radius-md: 8px;
 $radius-lg: 12px;

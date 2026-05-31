@@ -16,12 +16,12 @@ export function renderGameScreen(
       <header class="game-header">
         <div class="game-header__scores">
           <div class="score-badge score-badge--blue">
-            <span class="score-badge__dot"></span>
-            Blue ${state.scores.blue}
+            <img src="/images/icons/icon-player.png" style="width:16px;height:16px;object-fit:contain;filter:invert(60%) sepia(80%) saturate(500%) hue-rotate(175deg)" alt="" />
+            ${state.scores.blue}
           </div>
           <div class="score-badge score-badge--orange">
-            <span class="score-badge__dot"></span>
-            Orange ${state.scores.orange}
+            <img src="/images/icons/icon-player.png" style="width:16px;height:16px;object-fit:contain;filter:invert(60%) sepia(80%) saturate(500%) hue-rotate(340deg)" alt="" />
+            ${state.scores.orange}
           </div>
         </div>
         <div class="game-header__current">
@@ -42,7 +42,8 @@ export function renderGameScreen(
             >
               <div class="card__inner">
                 <div class="card__back">
-                  <img src="/images/icons/card-back.png" alt="" />
+                  <img src="/images/cards/${state.settings.theme}/card-back.png"
+                    onerror="this.src='/images/icons/card-back.png'" alt="" />
                 </div>
                 <div class="card__front">
                   <img src="${card.imageSrc}" alt="card" />

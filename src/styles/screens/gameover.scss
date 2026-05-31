@@ -7,14 +7,18 @@
   align-items: center;
   justify-content: center;
   gap: $spacing-lg;
+  background-color: var(--color-bg);
 
   &__title {
     font-size: clamp(4rem, 12vw, 8rem);
     font-weight: 900;
-    color: $color-card-back;
+    color: var(--color-gameover);
+    font-family: var(--font-gameover);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     text-shadow:
-      4px 4px 0 darken(#4ab8b0, 20%),
-      -2px -2px 0 darken(#4ab8b0, 30%);
+      4px 4px 0 var(--gameover-shadow-1),
+      -2px -2px 0 var(--gameover-shadow-2);
   }
 
   &__label {

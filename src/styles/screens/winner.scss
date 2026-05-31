@@ -9,6 +9,7 @@
   gap: $spacing-lg;
   position: relative;
   overflow: hidden;
+  background-color: var(--color-bg);
 
   &__confetti {
     position: absolute;
@@ -22,39 +23,33 @@
     font-size: 1.2rem;
     color: $color-text-muted;
     margin-bottom: -$spacing-sm;
+    font-family: var(--font-gameover);
   }
 
   &__name {
-    font-size: clamp(4rem, 10vw, 7rem);
+    font-size: clamp(2.5rem, 7vw, 4.5rem);
     font-weight: 900;
     text-transform: uppercase;
     line-height: 1;
+    font-family: var(--font-gameover);
 
     &--blue {
       color: $color-player-blue;
-      text-shadow:
-        4px 4px 0 darken(#4ab4e8, 25%),
-        -2px -2px 0 darken(#4ab4e8, 35%);
+      text-shadow: 3px 3px 0 darken(#4ab4e8, 25%);
     }
-
     &--orange {
       color: $color-player-orange;
-      text-shadow:
-        4px 4px 0 darken(#e8914a, 25%),
-        -2px -2px 0 darken(#e8914a, 35%);
+      text-shadow: 3px 3px 0 darken(#e8914a, 25%);
     }
-
     &--draw {
-      color: $color-card-back;
-      text-shadow:
-        4px 4px 0 darken(#4ab8b0, 25%),
-        -2px -2px 0 darken(#4ab8b0, 35%);
+      color: var(--color-gameover);
+      text-shadow: 3px 3px 0 var(--gameover-shadow-1);
     }
   }
 
   &__avatar {
-    width: 160px;
-    height: 160px;
+    width: 180px;
+    height: 180px;
     object-fit: contain;
   }
 }
