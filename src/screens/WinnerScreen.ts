@@ -1,62 +1,93 @@
 import type { GameState, Player } from '../types';
 import { getWinner } from '../game/engine';
 
+const CONFETTI_COUNT = 60;
+const CONFETTI_COLORS = ['#e84a4a', '#4ab4e8', '#e8d44a', '#4ae877', '#e8914a'];
+const CONFETTI_HEIGHT = 120;
+
+/** Returns the avatar image path based on winner and theme. */
+function getAvatarSrc(result: Player | 'draw', isGaming: boolean): string {
+  if (result === 'draw') {
+    return `/images/icons/player-draw${isGaming ? '-gaming' : ''}.png`;
+  }
+  return isGaming ? '/images/icons/trophy.png' : `/images/icons/player-${result}.png`;
+}
+
+/** Returns the formatted winner name for display. */
+function getWinnerLabel(winner: Player, isGaming: boolean): string {
+  return isGaming
+    ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} Player`
+    : `${winner.toUpperCase()} PLAYER`;
+}
+
+/** Returns the restart button label for the current theme. */
+function getRestartLabel(isGaming: boolean): string {
+  return isGaming ? 'Home' : 'Back to start';
+}
+
+/** Builds the draw result screen HTML. */
+function buildDrawHtml(isGaming: boolean): string {
+  return `
+    <p class="screen-winner__label">It's a</p>
+    <h1 class="screen-winner__name screen-winner__name--draw">DRAW</h1>
+    <img class="screen-winner__avatar" src="${getAvatarSrc('draw', isGaming)}" alt="draw" />
+    <button class="btn btn--secondary" id="btn-restart">${getRestartLabel(isGaming)}</button>`;
+}
+
+/** Builds the winner result screen HTML. */
+function buildWinnerHtml(winner: Player, isGaming: boolean): string {
+  return `
+    <canvas class="screen-winner__confetti" id="confetti-canvas"></canvas>
+    <p class="screen-winner__label">The winner is</p>
+    <h1 class="screen-winner__name screen-winner__name--${winner}">
+      ${getWinnerLabel(winner, isGaming)}
+    </h1>
+    <img class="screen-winner__avatar" src="${getAvatarSrc(winner, isGaming)}" alt="${winner} player" />
+    <button class="btn btn--secondary" id="btn-restart">${getRestartLabel(isGaming)}</button>`;
+}
+
+/** Renders the winner screen with optional confetti animation. */
 export function renderWinnerScreen(state: GameState, onRestart: () => void): HTMLElement {
   const result = getWinner(state);
-  const isDraw = result === 'draw';
-  const winner = result as Player;
   const isGaming = state.settings.theme === 'gaming';
-
-  // Gaming theme uses trophy for winner, same scale for draw
-  const winnerAvatar = isGaming
-    ? `/images/icons/trophy.png`
-    : `/images/icons/player-${winner}.png`;
+  const isDraw = result === 'draw';
 
   const el = document.createElement('div');
   el.className = 'screen-winner';
 
-  if (isDraw) {
-    el.innerHTML = `
-      <p class="screen-winner__label">It's a</p>
-      <h1 class="screen-winner__name screen-winner__name--draw">DRAW</h1>
-      <img class="screen-winner__avatar" src="/images/icons/player-draw${isGaming ? '-gaming' : ''}.png" alt="draw" />
-      <button class="btn btn--secondary" id="btn-restart">${isGaming ? 'Home' : 'Back to start'}</button>
-    `;
-  } else {
-    el.innerHTML = `
-      <canvas class="screen-winner__confetti" id="confetti-canvas"></canvas>
-      <p class="screen-winner__label">The winner is</p>
-      <h1 class="screen-winner__name screen-winner__name--${winner}">
-        ${isGaming ? winner.charAt(0).toUpperCase() + winner.slice(1) + ' Player' : winner.toUpperCase() + ' PLAYER'}
-      </h1>
-      <img class="screen-winner__avatar" src="${winnerAvatar}" alt="${winner} player" />
-      <button class="btn btn--secondary" id="btn-restart">${isGaming ? 'Home' : 'Back to start'}</button>
-    `;
-    startConfetti(el.querySelector<HTMLCanvasElement>('#confetti-canvas')!);
+  el.innerHTML = isDraw
+    ? buildDrawHtml(isGaming)
+    : buildWinnerHtml(result as Player, isGaming);
+
+  if (!isDraw) {
+    const canvas = el.querySelector<HTMLCanvasElement>('#confetti-canvas')!;
+    startConfetti(canvas);
   }
 
   el.querySelector('#btn-restart')!.addEventListener('click', onRestart);
   return el;
 }
 
-function startConfetti(canvas: HTMLCanvasElement) {
+/** Animates confetti particles across the canvas. */
+function startConfetti(canvas: HTMLCanvasElement): void {
   const ctx = canvas.getContext('2d')!;
   const W = (canvas.width = canvas.offsetWidth || window.innerWidth);
-  const H = (canvas.height = 120);
-  const colors = ['#e84a4a', '#4ab4e8', '#e8d44a', '#4ae877', '#e8914a'];
-  const pieces = Array.from({ length: 60 }, () => ({
+  const H = (canvas.height = CONFETTI_HEIGHT);
+
+  const pieces = Array.from({ length: CONFETTI_COUNT }, () => ({
     x: Math.random() * W,
     y: Math.random() * H - H,
     w: 8 + Math.random() * 8,
     h: 4 + Math.random() * 6,
-    color: colors[Math.floor(Math.random() * colors.length)],
+    color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
     speed: 1.5 + Math.random() * 2,
     angle: Math.random() * Math.PI * 2,
     spin: (Math.random() - 0.5) * 0.15,
   }));
 
   let raf: number;
-  const draw = () => {
+
+  const draw = (): void => {
     ctx.clearRect(0, 0, W, H);
     pieces.forEach((p) => {
       ctx.save();
@@ -71,6 +102,7 @@ function startConfetti(canvas: HTMLCanvasElement) {
     });
     raf = requestAnimationFrame(draw);
   };
+
   draw();
 
   canvas.closest('.screen-winner')?.addEventListener(
