@@ -6,6 +6,7 @@
   grid-template-columns: 1fr 1fr;
   background-color: #ffffff;
   color: #1a1a1a;
+  overflow-y: auto;
 
   @media (max-width: $bp-md) {
     grid-template-columns: 1fr;
@@ -16,6 +17,11 @@
     flex-direction: column;
     gap: $spacing-lg;
     padding: $spacing-xl;
+
+    @media (max-width: $bp-sm) {
+      padding: $spacing-md;
+      gap: $spacing-md;
+    }
   }
 
   &__title-wrap {
@@ -61,6 +67,10 @@
     justify-content: center;
     gap: $spacing-md;
     padding: $spacing-xl;
+
+    @media (max-width: $bp-md) {
+      padding: $spacing-md;
+    }
   }
 
   &__preview {
@@ -68,6 +78,10 @@
     max-width: 340px;
     border-radius: $radius-lg;
     overflow: hidden;
+
+    @media (max-width: $bp-md) {
+      max-width: 280px;
+    }
 
     img {
       width: 100%;
@@ -84,6 +98,11 @@
     flex-wrap: wrap;
     color: #555;
     font-size: 0.9rem;
+
+    @media (max-width: $bp-sm) {
+      justify-content: center;
+      gap: 0.5rem;
+    }
 
     .divider {
       color: $color-accent;

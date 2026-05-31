@@ -9,6 +9,12 @@
   position: relative;
   overflow: hidden;
 
+  @media (max-width: $bp-sm) {
+    padding: $spacing-lg $spacing-md;
+    align-items: flex-start;
+    padding-top: 4rem;
+  }
+
   &__content {
     display: flex;
     flex-direction: column;
@@ -20,6 +26,11 @@
       font-size: 1.2rem;
       padding: 1rem 2.5rem;
       border-radius: 0;
+
+      @media (max-width: $bp-sm) {
+        font-size: 1rem;
+        padding: 0.85rem 2rem;
+      }
     }
   }
 
@@ -27,15 +38,18 @@
     font-size: 1.2rem;
     color: $color-text-muted;
     margin-bottom: $spacing-xs;
+
+    @media (max-width: $bp-sm) {
+      font-size: 1rem;
+    }
   }
 
   &__title {
-    font-size: clamp(3rem, 9vw, 6rem);
+    font-size: clamp(2.5rem, 9vw, 6rem);
     font-weight: 900;
     line-height: 1.1;
     margin-bottom: $spacing-lg;
   }
-
 
   &__decoration {
     position: absolute;
@@ -47,5 +61,11 @@
     filter: brightness(0) saturate(100%) invert(93%) sepia(30%) saturate(700%)
       hue-rotate(338deg) brightness(105%) contrast(92%);
     opacity: 0.75;
+
+    @media (max-width: $bp-sm) {
+      width: 200px;
+      bottom: -2rem;
+      left: -2rem;
+    }
   }
 }
