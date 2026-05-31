@@ -29,5 +29,14 @@
   &__scores {
     display: flex;
     gap: $spacing-sm;
+    background-color: rgba(134, 233, 214, 0.2);
+    border-radius: $radius-md;
+    padding: 0.6rem 1.2rem;
   }
+}
+
+[data-theme='gaming'] .screen-gameover__scores {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
 }

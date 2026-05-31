@@ -28,13 +28,13 @@ export function renderGameOverScreen(state: GameState, onContinue: () => void): 
           ${playerIcon('blue')} <span style="color:#4ab4e8;font-weight:700">${state.scores.blue}</span>
         </span>
       </div>`
-    : `<div class="score-badge score-badge--blue">
-        <span class="score-badge__dot"></span>
-        Blue ${state.scores.blue}
+    : `<div class="score-badge score-badge--blue score-badge--no-bg">
+        <span class="score-badge__arrow"></span>
+        <span style="color:#4ab4e8;font-weight:700">Blue ${state.scores.blue}</span>
       </div>
-      <div class="score-badge score-badge--orange">
-        <span class="score-badge__dot"></span>
-        Orange ${state.scores.orange}
+      <div class="score-badge score-badge--orange score-badge--no-bg">
+        <span class="score-badge__arrow"></span>
+        <span style="color:#e8914a;font-weight:700">Orange ${state.scores.orange}</span>
       </div>`;
 
   el.innerHTML = `

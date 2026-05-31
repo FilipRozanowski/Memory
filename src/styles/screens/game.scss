@@ -58,6 +58,7 @@
 
   &--blue .score-badge__arrow  { background-color: $color-player-blue; }
   &--orange .score-badge__arrow { background-color: $color-player-orange; }
+  &--no-bg { background-color: transparent; padding: 0; }
 }
 
 .player-arrow {
