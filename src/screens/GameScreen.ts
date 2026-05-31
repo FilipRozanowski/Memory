@@ -1,10 +1,35 @@
 import type { GameState } from '../types';
 import { flipCard, isGameOver, unflipCards } from '../game/engine';
 
-const ICON_BLUE = `filter:invert(60%) sepia(80%) saturate(500%) hue-rotate(175deg)`;
+const ICON_BLUE   = `filter:invert(60%) sepia(80%) saturate(500%) hue-rotate(175deg)`;
 const ICON_ORANGE = `filter:invert(60%) sepia(80%) saturate(500%) hue-rotate(340deg)`;
 
-function renderHeaderCodeVibes(state: GameState): string {
+function playerIcon(color: 'blue' | 'orange', size = 18) {
+  return `<img src="/images/icons/icon-player.png"
+    style="width:${size}px;height:${size}px;object-fit:contain;${color === 'blue' ? ICON_BLUE : ICON_ORANGE}"
+    alt="" />`;
+}
+
+function buildHeader(state: GameState, isGaming: boolean): string {
+  if (isGaming) {
+    const cur = state.currentPlayer;
+    return `
+      <div class="game-header game-header--gaming">
+        <div class="score-combined">
+          <span class="score-combined__item">
+            ${playerIcon('orange')} ${state.scores.orange}
+          </span>
+          <span class="score-combined__divider"></span>
+          <span class="score-combined__item">
+            ${playerIcon('blue')} ${state.scores.blue}
+          </span>
+        </div>
+        <div class="game-header__current">
+          Current player: ${playerIcon(cur, 20)}
+        </div>
+        <button class="btn btn--exit btn--exit-gaming" id="btn-exit">⏻ Exit game</button>
+      </div>`;
+  }
   const curBg = state.currentPlayer === 'blue' ? '#4ab4e8' : '#e8914a';
   return `
     <div class="game-header game-header--code-vibes">
@@ -23,35 +48,7 @@ function renderHeaderCodeVibes(state: GameState): string {
         <span class="player-square" style="background:${curBg}"></span>
       </div>
       <button class="btn btn--exit" id="btn-exit">⏻ Exit game</button>
-    </div>
-  `;
-}
-
-function renderHeaderGaming(state: GameState): string {
-  const iconStyle = (c: 'blue' | 'orange') =>
-    `width:20px;height:20px;object-fit:contain;${c === 'blue' ? ICON_BLUE : ICON_ORANGE}`;
-  return `
-    <div class="game-header game-header--gaming">
-      <div class="score-combined">
-        <span class="score-combined__item score-combined__item--orange">
-          <img src="/images/icons/icon-player.png" style="${iconStyle('orange')}" alt="" />
-          ${state.scores.orange}
-        </span>
-        <span class="score-combined__divider"></span>
-        <span class="score-combined__item score-combined__item--blue">
-          <img src="/images/icons/icon-player.png" style="${iconStyle('blue')}" alt="" />
-          ${state.scores.blue}
-        </span>
-      </div>
-      <div class="game-header__current">
-        Current player:
-        <img src="/images/icons/icon-player.png"
-          style="${state.currentPlayer === 'blue' ? iconStyle('blue') : iconStyle('orange')}"
-          alt="" />
-      </div>
-      <button class="btn btn--exit btn--exit-gaming" id="btn-exit">⏻ Exit game</button>
-    </div>
-  `;
+    </div>`;
 }
 
 export function renderGameScreen(
@@ -65,57 +62,76 @@ export function renderGameScreen(
   const el = document.createElement('div');
   el.className = 'screen-game';
 
-  const render = () => {
-    const header = isGaming ? renderHeaderGaming(state) : renderHeaderCodeVibes(state);
+  // Header wrapper — updated in place without touching the board
+  const headerWrap = document.createElement('div');
 
-    el.innerHTML = `
-      ${header}
-      <div class="game-board">
-        <div class="game-board__grid game-board__grid--${state.settings.boardSize}">
-          ${state.cards.map((card) => `
-            <div
-              class="card ${card.isFlipped || card.isMatched ? 'is-flipped' : ''} ${card.isMatched ? 'is-matched' : ''}"
-              data-id="${card.id}"
-            >
-              <div class="card__inner">
-                <div class="card__back">
-                  <img src="/images/cards/${state.settings.theme}/card-back.png"
-                    onerror="this.src='/images/icons/card-back.png'" alt="" />
-                </div>
-                <div class="card__front">
-                  <img src="${card.imageSrc}" alt="card" />
-                </div>
-              </div>
+  // Board rendered once — only class changes on individual cards
+  const boardWrap = document.createElement('div');
+  boardWrap.className = 'game-board';
+  boardWrap.innerHTML = `
+    <div class="game-board__grid game-board__grid--${state.settings.boardSize}">
+      ${state.cards.map((card) => `
+        <div class="card" data-id="${card.id}">
+          <div class="card__inner">
+            <div class="card__back">
+              <img src="/images/cards/${state.settings.theme}/card-back.png"
+                onerror="this.src='/images/icons/card-back.png'" alt="" />
             </div>
-          `).join('')}
+            <div class="card__front">
+              <img src="${card.imageSrc}" alt="card" />
+            </div>
+          </div>
         </div>
-      </div>
-    `;
+      `).join('')}
+    </div>`;
 
-    el.querySelector('#btn-exit')!.addEventListener('click', onExit);
+  el.appendChild(headerWrap);
+  el.appendChild(boardWrap);
 
-    el.querySelectorAll<HTMLElement>('.card:not(.is-matched)').forEach((cardEl) => {
-      cardEl.addEventListener('click', () => {
-        const id = Number(cardEl.dataset.id);
-        state = flipCard(state, id);
-        render();
-
-        if (state.isLocked) {
-          setTimeout(() => {
-            state = unflipCards(state);
-            if (isGameOver(state)) {
-              onGameOver(state);
-            } else {
-              render();
-            }
-          }, 900);
-        } else if (isGameOver(state)) {
-          setTimeout(() => onGameOver(state), 400);
-        }
-      });
-    });
+  const updateHeader = () => {
+    headerWrap.innerHTML = buildHeader(state, isGaming);
+    headerWrap.querySelector('#btn-exit')!.addEventListener('click', onExit);
   };
 
-  render();
+  const cardEl = (id: number) =>
+    boardWrap.querySelector<HTMLElement>(`.card[data-id="${id}"]`)!;
+
+  boardWrap.addEventListener('click', (e) => {
+    const target = (e.target as HTMLElement).closest<HTMLElement>('.card');
+    if (!target) return;
+    if (target.classList.contains('is-flipped') || target.classList.contains('is-matched')) return;
+    if (state.isLocked) return;
+
+    const id = Number(target.dataset.id);
+    const prevFlipped = [...state.flippedCards];
+    state = flipCard(state, id);
+
+    // Flip this card visually
+    target.classList.add('is-flipped');
+
+    if (!state.isLocked && state.flippedCards.length === 0) {
+      // Match found — mark both as matched after flip animation
+      const matchedIds = [prevFlipped[0], id];
+      setTimeout(() => {
+        matchedIds.forEach(mid => cardEl(mid).classList.add('is-matched'));
+        updateHeader();
+        if (isGameOver(state)) setTimeout(() => onGameOver(state), 400);
+      }, 600);
+    } else if (state.isLocked) {
+      // No match — flip both back after pause
+      updateHeader();
+      setTimeout(() => {
+        const [firstId, secondId] = state.flippedCards;
+        state = unflipCards(state);
+        cardEl(firstId).classList.remove('is-flipped');
+        cardEl(secondId).classList.remove('is-flipped');
+        updateHeader();
+      }, 900);
+    } else {
+      updateHeader();
+    }
+  });
+
+  updateHeader();
   return el;
 }
