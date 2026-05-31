@@ -88,9 +88,30 @@ export function renderGameScreen(
   el.appendChild(headerWrap);
   el.appendChild(boardWrap);
 
+  const showExitModal = () => {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal">
+        <p class="modal__text">Are you sure you want to quit the game?</p>
+        <div class="modal__actions">
+          <button class="modal-btn--confirm modal-btn--confirm-back" id="modal-back">
+            ${isGaming ? 'No, back to game' : 'Back to game'}
+          </button>
+          <button class="modal-btn--confirm modal-btn--confirm-exit" id="modal-exit">
+            ${isGaming ? 'Yes, quit game' : 'Exit game'}
+          </button>
+        </div>
+      </div>
+    `;
+    overlay.querySelector('#modal-back')!.addEventListener('click', () => overlay.remove());
+    overlay.querySelector('#modal-exit')!.addEventListener('click', () => { overlay.remove(); onExit(); });
+    document.body.appendChild(overlay);
+  };
+
   const updateHeader = () => {
     headerWrap.innerHTML = buildHeader(state, isGaming);
-    headerWrap.querySelector('#btn-exit')!.addEventListener('click', onExit);
+    headerWrap.querySelector('#btn-exit')!.addEventListener('click', showExitModal);
   };
 
   const cardEl = (id: number) =>

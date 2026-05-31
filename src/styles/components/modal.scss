@@ -1,0 +1,81 @@
+@use '../variables' as *;
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: $radius-lg;
+  padding: $spacing-lg $spacing-xl;
+  max-width: 400px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+  &__text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+// Code Vibes modal buttons
+.modal-btn--confirm {
+  padding: 0.7rem 1.4rem;
+  border-radius: $radius-md;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity $transition-fast;
+
+  &:hover { opacity: 0.85; }
+
+  &-back {
+    background-color: $color-card-back;
+    color: #fff;
+    border: none;
+  }
+
+  &-exit {
+    background: transparent;
+    border: 2px solid $color-card-back;
+    color: $color-card-back;
+  }
+}
+
+// Gaming modal buttons
+[data-theme='gaming'] {
+  .modal-btn--confirm-back {
+    background-color: #e8006e;
+    color: #fff;
+    border: none;
+  }
+
+  .modal-btn--confirm-exit {
+    border-color: #e8006e;
+    color: #e8006e;
+  }
+
+  .modal__text {
+    color: #2a4a5e;
+  }
+}
