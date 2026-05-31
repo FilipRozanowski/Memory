@@ -11,41 +11,62 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $spacing-sm $spacing-md;
-  background-color: rgba(0, 0, 0, 0.3);
-
-  &__scores {
-    display: flex;
-    gap: $spacing-sm;
-  }
+  padding: 0.6rem $spacing-md;
+  background-color: rgba(0, 0, 0, 0.25);
 
   &__current {
     display: flex;
     align-items: center;
-    gap: $spacing-xs;
-    font-size: 0.9rem;
+    gap: 0.5rem;
+    font-size: 0.95rem;
     color: $color-text-muted;
   }
 }
 
-.score-badge {
+// Combined score box (gaming style)
+.score-combined {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  background-color: var(--color-bg-dark);
-  padding: 0.4rem 0.8rem;
-  border-radius: $radius-sm;
-  font-weight: 700;
-  font-size: 0.9rem;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: $radius-md;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 
-  &__dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    font-weight: 700;
+    font-size: 1rem;
+    color: $color-text;
   }
 
-  &--blue .score-badge__dot { background-color: $color-player-blue; }
-  &--orange .score-badge__dot { background-color: $color-player-orange; }
+  &__divider {
+    width: 1px;
+    height: 24px;
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+// Exit button — ghost with accent border
+.btn--exit {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: 0.5rem 1.2rem;
+  border-radius: $radius-md;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $color-text;
+  background: transparent;
+  border: 1px solid var(--color-accent);
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
 }
 
 .game-board {

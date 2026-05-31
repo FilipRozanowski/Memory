@@ -1,6 +1,15 @@
 import type { GameState } from '../types';
 import { flipCard, isGameOver, unflipCards } from '../game/engine';
 
+const ICON_BLUE = `filter:invert(60%) sepia(80%) saturate(500%) hue-rotate(175deg)`;
+const ICON_ORANGE = `filter:invert(60%) sepia(80%) saturate(500%) hue-rotate(340deg)`;
+
+function playerIcon(color: 'blue' | 'orange') {
+  return `<img src="/images/icons/icon-player.png"
+    style="width:18px;height:18px;object-fit:contain;${color === 'blue' ? ICON_BLUE : ICON_ORANGE}"
+    alt="" />`;
+}
+
 export function renderGameScreen(
   initialState: GameState,
   onGameOver: (state: GameState) => void,
@@ -14,25 +23,29 @@ export function renderGameScreen(
   const render = () => {
     el.innerHTML = `
       <header class="game-header">
-        <div class="game-header__scores">
-          <div class="score-badge score-badge--blue">
-            <img src="/images/icons/icon-player.png" style="width:16px;height:16px;object-fit:contain;filter:invert(60%) sepia(80%) saturate(500%) hue-rotate(175deg)" alt="" />
-            ${state.scores.blue}
-          </div>
-          <div class="score-badge score-badge--orange">
-            <img src="/images/icons/icon-player.png" style="width:16px;height:16px;object-fit:contain;filter:invert(60%) sepia(80%) saturate(500%) hue-rotate(340deg)" alt="" />
-            ${state.scores.orange}
-          </div>
+        <div class="score-combined">
+          <span class="score-combined__item score-combined__item--orange">
+            ${playerIcon('orange')} ${state.scores.orange}
+          </span>
+          <span class="score-combined__divider"></span>
+          <span class="score-combined__item score-combined__item--blue">
+            ${playerIcon('blue')} ${state.scores.blue}
+          </span>
         </div>
+
         <div class="game-header__current">
           Current player:
-          <span class="score-badge__dot" style="
-            width:14px;height:14px;border-radius:50%;display:inline-block;
-            background:${state.currentPlayer === 'blue' ? '#4ab4e8' : '#e8914a'}
-          "></span>
+          <img src="/images/icons/icon-player.png"
+            style="width:20px;height:20px;object-fit:contain;
+            ${state.currentPlayer === 'blue' ? ICON_BLUE : ICON_ORANGE}"
+            alt="" />
         </div>
-        <button class="btn btn--ghost" id="btn-exit">⏻ Exit game</button>
+
+        <button class="btn btn--exit" id="btn-exit">
+          ⏻ Exit game
+        </button>
       </header>
+
       <div class="game-board">
         <div class="game-board__grid game-board__grid--${state.settings.boardSize}">
           ${state.cards.map((card) => `
