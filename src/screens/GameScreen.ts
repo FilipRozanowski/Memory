@@ -4,10 +4,54 @@ import { flipCard, isGameOver, unflipCards } from '../game/engine';
 const ICON_BLUE = `filter:invert(60%) sepia(80%) saturate(500%) hue-rotate(175deg)`;
 const ICON_ORANGE = `filter:invert(60%) sepia(80%) saturate(500%) hue-rotate(340deg)`;
 
-function playerIcon(color: 'blue' | 'orange') {
-  return `<img src="/images/icons/icon-player.png"
-    style="width:18px;height:18px;object-fit:contain;${color === 'blue' ? ICON_BLUE : ICON_ORANGE}"
-    alt="" />`;
+function renderHeaderCodeVibes(state: GameState): string {
+  const curBg = state.currentPlayer === 'blue' ? '#4ab4e8' : '#e8914a';
+  return `
+    <div class="game-header game-header--code-vibes">
+      <div class="game-header__scores">
+        <div class="score-badge score-badge--blue">
+          <span class="score-badge__dot"></span>
+          Blue ${state.scores.blue}
+        </div>
+        <div class="score-badge score-badge--orange">
+          <span class="score-badge__dot"></span>
+          Orange ${state.scores.orange}
+        </div>
+      </div>
+      <div class="game-header__current">
+        Current player:
+        <span class="player-square" style="background:${curBg}"></span>
+      </div>
+      <button class="btn btn--exit" id="btn-exit">⏻ Exit game</button>
+    </div>
+  `;
+}
+
+function renderHeaderGaming(state: GameState): string {
+  const iconStyle = (c: 'blue' | 'orange') =>
+    `width:20px;height:20px;object-fit:contain;${c === 'blue' ? ICON_BLUE : ICON_ORANGE}`;
+  return `
+    <div class="game-header game-header--gaming">
+      <div class="score-combined">
+        <span class="score-combined__item score-combined__item--orange">
+          <img src="/images/icons/icon-player.png" style="${iconStyle('orange')}" alt="" />
+          ${state.scores.orange}
+        </span>
+        <span class="score-combined__divider"></span>
+        <span class="score-combined__item score-combined__item--blue">
+          <img src="/images/icons/icon-player.png" style="${iconStyle('blue')}" alt="" />
+          ${state.scores.blue}
+        </span>
+      </div>
+      <div class="game-header__current">
+        Current player:
+        <img src="/images/icons/icon-player.png"
+          style="${state.currentPlayer === 'blue' ? iconStyle('blue') : iconStyle('orange')}"
+          alt="" />
+      </div>
+      <button class="btn btn--exit btn--exit-gaming" id="btn-exit">⏻ Exit game</button>
+    </div>
+  `;
 }
 
 export function renderGameScreen(
@@ -16,36 +60,16 @@ export function renderGameScreen(
   onExit: () => void
 ): HTMLElement {
   let state = initialState;
+  const isGaming = state.settings.theme === 'gaming';
 
   const el = document.createElement('div');
   el.className = 'screen-game';
 
   const render = () => {
+    const header = isGaming ? renderHeaderGaming(state) : renderHeaderCodeVibes(state);
+
     el.innerHTML = `
-      <header class="game-header">
-        <div class="score-combined">
-          <span class="score-combined__item score-combined__item--orange">
-            ${playerIcon('orange')} ${state.scores.orange}
-          </span>
-          <span class="score-combined__divider"></span>
-          <span class="score-combined__item score-combined__item--blue">
-            ${playerIcon('blue')} ${state.scores.blue}
-          </span>
-        </div>
-
-        <div class="game-header__current">
-          Current player:
-          <img src="/images/icons/icon-player.png"
-            style="width:20px;height:20px;object-fit:contain;
-            ${state.currentPlayer === 'blue' ? ICON_BLUE : ICON_ORANGE}"
-            alt="" />
-        </div>
-
-        <button class="btn btn--exit" id="btn-exit">
-          ⏻ Exit game
-        </button>
-      </header>
-
+      ${header}
       <div class="game-board">
         <div class="game-board__grid game-board__grid--${state.settings.boardSize}">
           ${state.cards.map((card) => `

@@ -7,12 +7,12 @@
   background-color: var(--color-bg);
 }
 
+// ── Shared header base ──────────────────────────────────────────
 .game-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.6rem $spacing-md;
-  background-color: rgba(0, 0, 0, 0.25);
+  padding: 0.75rem $spacing-md;
 
   &__current {
     display: flex;
@@ -23,20 +23,63 @@
   }
 }
 
-// Combined score box (gaming style)
+// ── Code Vibes header — no background, floating badges ──────────
+.game-header--code-vibes {
+  background: transparent;
+
+  .game-header__scores {
+    display: flex;
+    gap: $spacing-sm;
+  }
+}
+
+.score-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: rgba(0, 0, 0, 0.35);
+  padding: 0.4rem 0.9rem;
+  border-radius: $radius-sm;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: $color-text;
+
+  &__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  &--blue .score-badge__dot  { background-color: $color-player-blue; }
+  &--orange .score-badge__dot { background-color: $color-player-orange; }
+}
+
+.player-square {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+
+// ── Gaming header — semi-transparent bar, combined score box ─────
+.game-header--gaming {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: $radius-lg;
+  margin: 0.6rem $spacing-md 0;
+}
+
 .score-combined {
   display: flex;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(255, 255, 255, 0.15);
   border-radius: $radius-md;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
 
   &__item {
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.4rem 0.9rem;
+    padding: 0.4rem 1rem;
     font-weight: 700;
     font-size: 1rem;
     color: $color-text;
@@ -45,11 +88,11 @@
   &__divider {
     width: 1px;
     height: 24px;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.25);
   }
 }
 
-// Exit button — ghost with accent border
+// ── Exit buttons ─────────────────────────────────────────────────
 .btn--exit {
   display: inline-flex;
   align-items: center;
@@ -60,15 +103,19 @@
   font-weight: 600;
   color: $color-text;
   background: transparent;
-  border: 1px solid var(--color-accent);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   cursor: pointer;
   transition: background $transition-fast;
 
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+  &:hover { background-color: rgba(255, 255, 255, 0.08); }
+
+  &-gaming {
+    border-color: #e8006e;
+    color: $color-text;
   }
 }
 
+// ── Board ─────────────────────────────────────────────────────────
 .game-board {
   flex: 1;
   display: flex;
