@@ -106,7 +106,7 @@ export function renderGameScreen(
     `;
     overlay.querySelector('#modal-back')!.addEventListener('click', () => overlay.remove());
     overlay.querySelector('#modal-exit')!.addEventListener('click', () => { overlay.remove(); onExit(); });
-    document.body.appendChild(overlay);
+    document.getElementById('app')!.appendChild(overlay);
   };
 
   const updateHeader = () => {
