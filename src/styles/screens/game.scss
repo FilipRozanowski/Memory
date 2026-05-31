@@ -105,16 +105,18 @@
   font-size: 0.9rem;
   font-weight: 600;
   color: $color-text;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background-color: rgba(134, 233, 214, 0.2);
+  border: 1px solid #86E9D6;
   cursor: pointer;
   transition: background $transition-fast;
 
-  &:hover { background-color: rgba(255, 255, 255, 0.08); }
+  &:hover { background-color: rgba(134, 233, 214, 0.35); }
 
   &-gaming {
     border-color: #e8006e;
-    color: $color-text;
+    background-color: rgba(232, 0, 110, 0.15);
+
+    &:hover { background-color: rgba(232, 0, 110, 0.28); }
   }
 }
 
