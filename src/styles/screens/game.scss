@@ -12,13 +12,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem $spacing-md;
+  padding: 1.1rem $spacing-md;
 
   &__current {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     color: $color-text-muted;
   }
 }
@@ -38,16 +38,16 @@
   align-items: center;
   gap: 0.4rem;
   background-color: rgba(134, 233, 214, 0.2);
-  padding: 0.4rem 0.9rem;
+  padding: 0.6rem 1.2rem;
   border-radius: $radius-sm;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   color: $color-text;
 
   &__arrow {
     display: inline-block;
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     clip-path: polygon(0% 15%, 0% 85%, 65% 85%, 100% 50%, 65% 15%);
     flex-shrink: 0;
   }
@@ -102,7 +102,7 @@
   gap: $spacing-xs;
   padding: 0.5rem 1.2rem;
   border-radius: $radius-md;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: $color-text;
   background-color: rgba(134, 233, 214, 0.2);
