@@ -52,4 +52,27 @@
     height: 180px;
     object-fit: contain;
   }
+
+  .btn--secondary {
+    background-color: transparent;
+    border: 2px solid #ccc;
+    color: $color-text;
+    padding: 0.8rem 2rem;
+    border-radius: $radius-md;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity $transition-fast;
+
+    &:hover { opacity: 0.8; }
+  }
+}
+
+[data-theme='gaming'] .screen-winner .btn--secondary {
+  border: 2px solid #E71C4F;
+  background-color: rgba(237, 27, 118, 0.08);
+  color: $color-text;
+  border-radius: $radius-lg;
+  font-size: 1.1rem;
+  padding: 0.9rem 2.5rem;
 }
