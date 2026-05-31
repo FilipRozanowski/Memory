@@ -17,15 +17,11 @@
   width: 100%;
   margin: 0 auto;
 
-  @media (max-width: $bp-md) {
-    padding: 0.8rem $spacing-md;
+  @media (max-width: $bp-sm) {
+    padding: 0.7rem $spacing-sm;
     flex-direction: column;
     align-items: stretch;
     gap: 0.5rem;
-  }
-
-  @media (max-width: $bp-sm) {
-    padding: 0.7rem $spacing-sm;
   }
 
   &__current {
@@ -37,12 +33,15 @@
     color: $color-text;
   }
 
-  // always a flex row: current player left, exit right
+  // second row on mobile: current player left, exit right
   &__bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: $spacing-sm;
+    display: contents; // desktop: children participate in parent flex directly
+
+    @media (max-width: $bp-sm) {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
   }
 }
 
@@ -96,13 +95,9 @@
   max-width: 900px;
   width: calc(100% - #{$spacing-xl} * 2);
 
-  @media (max-width: $bp-md) {
-    width: calc(100% - #{$spacing-md} * 2);
-    margin: 0.4rem auto 0;
-  }
-
   @media (max-width: $bp-sm) {
     width: calc(100% - #{$spacing-sm} * 2);
+    margin: 0.4rem auto 0;
   }
 
   // score-combined is full-width row on mobile
