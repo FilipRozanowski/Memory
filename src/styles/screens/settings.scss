@@ -159,12 +159,28 @@
   cursor: pointer;
   font-size: 0.95rem;
   color: #333;
+  transition: color 150ms ease;
 
   input[type='radio'] {
     accent-color: #1a1a1a;
     width: 18px;
     height: 18px;
     cursor: pointer;
+  }
+
+  &:hover {
+    color: #1a1a1a;
+    font-weight: 600;
+
+    &::after {
+      content: '';
+      display: inline-block;
+      width: 30px;
+      height: 3px;
+      background-color: rgba($color-accent, 0.4);
+      margin-left: 6px;
+      border-radius: 2px;
+    }
   }
 
   &.is-selected {
@@ -181,4 +197,9 @@
       border-radius: 2px;
     }
   }
+}
+
+.summary-placeholder {
+  color: #aaa;
+  font-style: italic;
 }

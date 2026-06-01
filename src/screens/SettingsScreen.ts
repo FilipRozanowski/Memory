@@ -4,6 +4,9 @@ import { THEMES } from '../game/themes';
 const THEMES_LIST: Theme[] = ['code-vibes', 'gaming'];
 const BOARD_SIZES: BoardSize[] = [16, 24, 36];
 
+const PLACEHOLDER_PLAYER = 'Player';
+const PLACEHOLDER_SIZE = 'Board size';
+
 /** Capitalizes the first letter of a string. */
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -33,11 +36,11 @@ function buildThemeOptions(settings: GameSettings): string {
     </div>`;
 }
 
-/** Builds the starting player selection group HTML. */
-function buildPlayerOptions(settings: GameSettings): string {
+/** Builds the starting player selection group HTML — no pre-selection. */
+function buildPlayerOptions(): string {
   const players: Player[] = ['blue', 'orange'];
   const options = players.map((p) =>
-    buildRadioOption('player', p, capitalize(p), p === settings.startingPlayer)
+    buildRadioOption('player', p, capitalize(p), false)
   ).join('');
   return `
     <div class="settings-group">
@@ -49,10 +52,10 @@ function buildPlayerOptions(settings: GameSettings): string {
     </div>`;
 }
 
-/** Builds the board size selection group HTML. */
-function buildSizeOptions(settings: GameSettings): string {
+/** Builds the board size selection group HTML — no pre-selection. */
+function buildSizeOptions(): string {
   const options = BOARD_SIZES.map((s) =>
-    buildRadioOption('size', String(s), `${s} cards`, s === settings.boardSize)
+    buildRadioOption('size', String(s), `${s} cards`, false)
   ).join('');
   return `
     <div class="settings-group">
@@ -64,15 +67,15 @@ function buildSizeOptions(settings: GameSettings): string {
     </div>`;
 }
 
-/** Builds the summary bar showing the current selections. */
+/** Builds the summary bar with placeholders for unselected fields. */
 function buildSummaryBar(settings: GameSettings): string {
   return `
     <div class="screen-settings__actions">
       <span id="summary-theme">${THEMES[settings.theme].label}</span>
       <span class="divider">/</span>
-      <span id="summary-player">${capitalize(settings.startingPlayer)}</span>
+      <span id="summary-player" class="summary-placeholder">${PLACEHOLDER_PLAYER}</span>
       <span class="divider">/</span>
-      <span id="summary-size">${settings.boardSize} cards</span>
+      <span id="summary-size" class="summary-placeholder">${PLACEHOLDER_SIZE}</span>
       <button class="btn btn--primary" id="btn-start">▶ Start</button>
     </div>`;
 }
@@ -86,8 +89,8 @@ function buildSettingsHtml(settings: GameSettings): string {
         <div class="screen-settings__title-line"></div>
       </div>
       ${buildThemeOptions(settings)}
-      ${buildPlayerOptions(settings)}
-      ${buildSizeOptions(settings)}
+      ${buildPlayerOptions()}
+      ${buildSizeOptions()}
     </div>
     <div class="screen-settings__right">
       <div class="screen-settings__preview">
@@ -107,7 +110,7 @@ function registerListeners(el: HTMLElement, getSettings: () => GameSettings, upd
   el.querySelectorAll<HTMLInputElement>('input[name="theme"]').forEach((input) => {
     input.addEventListener('change', () => {
       updateSettings({ ...getSettings(), theme: input.value as Theme });
-      el.querySelectorAll('.radio-option').forEach((l) => l.classList.remove('is-selected'));
+      el.querySelectorAll('#theme-options .radio-option').forEach((l) => l.classList.remove('is-selected'));
       input.closest('.radio-option')?.classList.add('is-selected');
       summaryTheme.textContent = THEMES[getSettings().theme].label;
       previewImg.src = THEMES[getSettings().theme].previewImage;
@@ -117,18 +120,20 @@ function registerListeners(el: HTMLElement, getSettings: () => GameSettings, upd
   el.querySelectorAll<HTMLInputElement>('input[name="player"]').forEach((input) => {
     input.addEventListener('change', () => {
       updateSettings({ ...getSettings(), startingPlayer: input.value as Player });
-      input.closest('.settings-group')?.querySelectorAll('.radio-option').forEach((l) => l.classList.remove('is-selected'));
+      el.querySelectorAll('#player-options .radio-option').forEach((l) => l.classList.remove('is-selected'));
       input.closest('.radio-option')?.classList.add('is-selected');
       summaryPlayer.textContent = capitalize(getSettings().startingPlayer);
+      summaryPlayer.classList.remove('summary-placeholder');
     });
   });
 
   el.querySelectorAll<HTMLInputElement>('input[name="size"]').forEach((input) => {
     input.addEventListener('change', () => {
       updateSettings({ ...getSettings(), boardSize: Number(input.value) as BoardSize });
-      input.closest('.settings-group')?.querySelectorAll('.radio-option').forEach((l) => l.classList.remove('is-selected'));
+      el.querySelectorAll('#size-options .radio-option').forEach((l) => l.classList.remove('is-selected'));
       input.closest('.radio-option')?.classList.add('is-selected');
       summarySize.textContent = `${getSettings().boardSize} cards`;
+      summarySize.classList.remove('summary-placeholder');
     });
   });
 }
