@@ -32,7 +32,7 @@ function goToSettings(): void {
 function goToGame(settings: GameSettings): void {
   setTheme(settings.theme);
   const state = createInitialState(settings);
-  show(renderGameScreen(state, goToGameOver, goToStart));
+  show(renderGameScreen(state, goToGameOver, goToSettings));
 }
 
 function goToGameOver(state: GameState): void {
