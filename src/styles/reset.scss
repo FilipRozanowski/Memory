@@ -19,14 +19,10 @@ body {
   color: $color-text;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  display: flex;
-  justify-content: center;
 }
 
 #app {
   font-family: var(--font-main);
-  width: 100%;
-  max-width: 1440px;
 }
 
 button {

@@ -83,20 +83,22 @@ function buildSummaryBar(settings: GameSettings): string {
 /** Builds the full settings screen HTML. */
 function buildSettingsHtml(settings: GameSettings): string {
   return `
-    <div class="screen-settings__left">
-      <div class="screen-settings__title-wrap">
-        <h1 class="screen-settings__title">Settings</h1>
-        <div class="screen-settings__title-line"></div>
+    <div class="screen-settings__inner">
+      <div class="screen-settings__left">
+        <div class="screen-settings__title-wrap">
+          <h1 class="screen-settings__title">Settings</h1>
+          <div class="screen-settings__title-line"></div>
+        </div>
+        ${buildThemeOptions(settings)}
+        ${buildPlayerOptions()}
+        ${buildSizeOptions()}
       </div>
-      ${buildThemeOptions(settings)}
-      ${buildPlayerOptions()}
-      ${buildSizeOptions()}
-    </div>
-    <div class="screen-settings__right">
-      <div class="screen-settings__preview">
-        <img src="${THEMES[settings.theme].previewImage}" alt="Theme preview" />
+      <div class="screen-settings__right">
+        <div class="screen-settings__preview">
+          <img src="${THEMES[settings.theme].previewImage}" alt="Theme preview" />
+        </div>
+        ${buildSummaryBar(settings)}
       </div>
-      ${buildSummaryBar(settings)}
     </div>`;
 }
 

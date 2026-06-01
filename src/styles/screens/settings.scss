@@ -2,14 +2,20 @@
 
 .screen-settings {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   background-color: #ffffff;
   color: #1a1a1a;
   overflow-y: auto;
 
-  @media (max-width: $bp-md) {
-    grid-template-columns: 1fr;
+  &__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1440px;
+    margin: 0 auto;
+    min-height: 100%;
+
+    @media (max-width: $bp-md) {
+      grid-template-columns: 1fr;
+    }
   }
 
   &__left {

@@ -10,6 +10,9 @@
   position: relative;
   overflow: hidden;
   background-color: var(--color-bg);
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
 
   &__confetti {
     position: absolute;
