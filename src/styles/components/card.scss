@@ -57,6 +57,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
   }
 
@@ -69,4 +70,8 @@
       object-fit: cover;
     }
   }
+}
+
+[data-theme='gaming'] .card__back {
+  background-color: transparent;
 }
