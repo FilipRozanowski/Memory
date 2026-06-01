@@ -27,6 +27,12 @@
   &--primary {
     background-color: $color-accent;
     color: #1a1a1a;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
   }
 
   &--secondary {

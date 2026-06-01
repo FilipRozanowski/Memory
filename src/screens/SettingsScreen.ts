@@ -101,7 +101,7 @@ function buildSettingsHtml(settings: GameSettings): string {
 }
 
 /** Registers all radio input change listeners and wires up summary + preview updates. */
-function registerListeners(el: HTMLElement, getSettings: () => GameSettings, updateSettings: (s: GameSettings) => void): void {
+function registerListeners(el: HTMLElement, getSettings: () => GameSettings, updateSettings: (s: GameSettings, field: string) => void): void {
   const summaryTheme  = el.querySelector<HTMLElement>('#summary-theme')!;
   const summaryPlayer = el.querySelector<HTMLElement>('#summary-player')!;
   const summarySize   = el.querySelector<HTMLElement>('#summary-size')!;
@@ -109,7 +109,7 @@ function registerListeners(el: HTMLElement, getSettings: () => GameSettings, upd
 
   el.querySelectorAll<HTMLInputElement>('input[name="theme"]').forEach((input) => {
     input.addEventListener('change', () => {
-      updateSettings({ ...getSettings(), theme: input.value as Theme });
+      updateSettings({ ...getSettings(), theme: input.value as Theme }, 'theme');
       el.querySelectorAll('#theme-options .radio-option').forEach((l) => l.classList.remove('is-selected'));
       input.closest('.radio-option')?.classList.add('is-selected');
       summaryTheme.textContent = THEMES[getSettings().theme].label;
@@ -119,7 +119,7 @@ function registerListeners(el: HTMLElement, getSettings: () => GameSettings, upd
 
   el.querySelectorAll<HTMLInputElement>('input[name="player"]').forEach((input) => {
     input.addEventListener('change', () => {
-      updateSettings({ ...getSettings(), startingPlayer: input.value as Player });
+      updateSettings({ ...getSettings(), startingPlayer: input.value as Player }, 'player');
       el.querySelectorAll('#player-options .radio-option').forEach((l) => l.classList.remove('is-selected'));
       input.closest('.radio-option')?.classList.add('is-selected');
       summaryPlayer.textContent = capitalize(getSettings().startingPlayer);
@@ -129,7 +129,7 @@ function registerListeners(el: HTMLElement, getSettings: () => GameSettings, upd
 
   el.querySelectorAll<HTMLInputElement>('input[name="size"]').forEach((input) => {
     input.addEventListener('change', () => {
-      updateSettings({ ...getSettings(), boardSize: Number(input.value) as BoardSize });
+      updateSettings({ ...getSettings(), boardSize: Number(input.value) as BoardSize }, 'size');
       el.querySelectorAll('#size-options .radio-option').forEach((l) => l.classList.remove('is-selected'));
       input.closest('.radio-option')?.classList.add('is-selected');
       summarySize.textContent = `${getSettings().boardSize} cards`;
@@ -141,17 +141,31 @@ function registerListeners(el: HTMLElement, getSettings: () => GameSettings, upd
 /** Renders the settings screen with theme, player, and board size selection. */
 export function renderSettingsScreen(onStart: (settings: GameSettings) => void): HTMLElement {
   let settings: GameSettings = { theme: 'code-vibes', startingPlayer: 'blue', boardSize: 16 };
+  let playerSelected = false;
+  let sizeSelected = false;
 
   const el = document.createElement('div');
   el.className = 'screen-settings';
   el.innerHTML = buildSettingsHtml(settings);
 
+  const btnStart = el.querySelector<HTMLButtonElement>('#btn-start')!;
+  btnStart.disabled = true;
+
+  const updateStartButton = (): void => {
+    btnStart.disabled = !(playerSelected && sizeSelected);
+  };
+
   registerListeners(
     el,
     () => settings,
-    (updated) => { settings = updated; }
+    (updated, field) => {
+      settings = updated;
+      if (field === 'player') { playerSelected = true; }
+      if (field === 'size')   { sizeSelected = true; }
+      updateStartButton();
+    }
   );
 
-  el.querySelector('#btn-start')!.addEventListener('click', () => onStart(settings));
+  btnStart.addEventListener('click', () => onStart(settings));
   return el;
 }
