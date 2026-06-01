@@ -31,6 +31,28 @@
         font-size: 1rem;
         padding: 0.85rem 2rem;
       }
+
+      .btn__icon {
+        transition: transform 300ms ease;
+      }
+
+      .btn__arrow {
+        display: inline-block;
+        font-size: 1.2rem;
+        font-weight: 900;
+        transition: transform 300ms ease, font-size 300ms ease;
+      }
+
+      &:hover {
+        .btn__icon {
+          transform: rotate(30deg);
+        }
+
+        .btn__arrow {
+          transform: scale(1.4);
+          font-size: 1.5rem;
+        }
+      }
     }
   }
 

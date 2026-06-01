@@ -6,7 +6,7 @@ function buildStartHtml(): string {
       <h1 class="screen-start__title">Ready to play?</h1>
       <button class="btn btn--primary" id="btn-play">
         <img src="/images/icons/icon-play.png" alt="" class="btn__icon" />
-        Play →
+        Play <span class="btn__arrow">→</span>
       </button>
     </div>
     <img
