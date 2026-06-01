@@ -40,7 +40,7 @@
         display: inline-block;
         font-size: 1.2rem;
         font-weight: 900;
-        transition: transform 300ms ease, font-size 300ms ease;
+        transition: transform 300ms ease;
       }
 
       &:hover {
@@ -49,8 +49,7 @@
         }
 
         .btn__arrow {
-          transform: scale(1.4);
-          font-size: 1.5rem;
+          transform: scale(1.5);
         }
       }
     }
