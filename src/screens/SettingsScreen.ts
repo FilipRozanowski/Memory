@@ -15,12 +15,25 @@ interface SettingsDomRefs {
   previewImg: HTMLImageElement;
 }
 
-/** Capitalizes the first letter of a string. */
+/**
+ * Capitalizes the first letter of a string.
+ *
+ * @param str - The input string to capitalize
+ * @returns The string with its first character uppercased
+ */
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-/** Builds the HTML for a single radio option. */
+/**
+ * Builds the HTML for a single radio option label.
+ *
+ * @param name - The `name` attribute for the radio input group
+ * @param value - The `value` attribute for this option
+ * @param label - The visible text shown inside the label
+ * @param isSelected - Whether this option should render as pre-selected
+ * @returns An HTML string containing the label and radio input
+ */
 function buildRadioOption(name: string, value: string, label: string, isSelected: boolean): string {
   return `
     <label class="radio-option ${isSelected ? 'is-selected' : ''}">
@@ -29,7 +42,12 @@ function buildRadioOption(name: string, value: string, label: string, isSelected
     </label>`;
 }
 
-/** Builds the theme selection group HTML with the current theme pre-selected. */
+/**
+ * Builds the theme selection group HTML with the current theme pre-selected.
+ *
+ * @param settings - The current game settings used to mark the active theme
+ * @returns An HTML string for the full theme radio group
+ */
 function buildThemeOptions(settings: GameSettings): string {
   const options = THEMES_LIST.map((t) =>
     buildRadioOption('theme', t, THEMES[t].label, t === settings.theme)
@@ -44,7 +62,11 @@ function buildThemeOptions(settings: GameSettings): string {
     </div>`;
 }
 
-/** Builds the starting player selection group HTML with no pre-selection. */
+/**
+ * Builds the starting player selection group HTML with no pre-selection.
+ *
+ * @returns An HTML string for the full player radio group
+ */
 function buildPlayerOptions(): string {
   const players: Player[] = ['blue', 'orange'];
   const options = players.map((p) =>
@@ -60,7 +82,11 @@ function buildPlayerOptions(): string {
     </div>`;
 }
 
-/** Builds the board size selection group HTML with no pre-selection. */
+/**
+ * Builds the board size selection group HTML with no pre-selection.
+ *
+ * @returns An HTML string for the full board size radio group
+ */
 function buildSizeOptions(): string {
   const options = BOARD_SIZES.map((s) =>
     buildRadioOption('size', String(s), `${s} cards`, false)
@@ -75,7 +101,12 @@ function buildSizeOptions(): string {
     </div>`;
 }
 
-/** Builds the summary bar with placeholders for fields not yet selected. */
+/**
+ * Builds the summary bar with the active theme and placeholders for unselected fields.
+ *
+ * @param settings - The current game settings used to show the active theme label
+ * @returns An HTML string for the summary/actions bar
+ */
 function buildSummaryBar(settings: GameSettings): string {
   return `
     <div class="screen-settings__actions">
@@ -88,7 +119,12 @@ function buildSummaryBar(settings: GameSettings): string {
     </div>`;
 }
 
-/** Builds the full settings screen HTML. */
+/**
+ * Builds the full settings screen HTML including all option groups.
+ *
+ * @param settings - The current game settings used to pre-select the active theme
+ * @returns An HTML string for the complete settings screen layout
+ */
 function buildSettingsHtml(settings: GameSettings): string {
   return `
     <div class="screen-settings__inner">
@@ -110,7 +146,12 @@ function buildSettingsHtml(settings: GameSettings): string {
     </div>`;
 }
 
-/** Queries and returns all relevant DOM refs from the settings element. */
+/**
+ * Queries and returns all relevant DOM refs from the settings element.
+ *
+ * @param el - The root settings screen element to query within
+ * @returns An object containing references to the summary spans and preview image
+ */
 function getSettingsDomRefs(el: HTMLElement): SettingsDomRefs {
   return {
     summaryTheme:  el.querySelector<HTMLElement>('#summary-theme')!,
@@ -120,7 +161,14 @@ function getSettingsDomRefs(el: HTMLElement): SettingsDomRefs {
   };
 }
 
-/** Registers hover and change listeners for the theme radio inputs. */
+/**
+ * Registers hover and change listeners for the theme radio inputs.
+ *
+ * @param el - The root settings screen element
+ * @param getSettings - Returns the current settings snapshot
+ * @param update - Persists the updated settings and signals which field changed
+ * @param refs - DOM references for the summary bar and preview image
+ */
 function registerThemeListeners(el: HTMLElement, getSettings: () => GameSettings, update: (s: GameSettings, f: string) => void, refs: SettingsDomRefs): void {
   el.querySelectorAll<HTMLInputElement>('input[name="theme"]').forEach((input) => {
     const label = input.closest('.radio-option')!;
@@ -136,7 +184,14 @@ function registerThemeListeners(el: HTMLElement, getSettings: () => GameSettings
   });
 }
 
-/** Registers change listeners for the player radio inputs. */
+/**
+ * Registers change listeners for the player radio inputs.
+ *
+ * @param el - The root settings screen element
+ * @param getSettings - Returns the current settings snapshot
+ * @param update - Persists the updated settings and signals which field changed
+ * @param refs - DOM references for the summary bar
+ */
 function registerPlayerListeners(el: HTMLElement, getSettings: () => GameSettings, update: (s: GameSettings, f: string) => void, refs: SettingsDomRefs): void {
   el.querySelectorAll<HTMLInputElement>('input[name="player"]').forEach((input) => {
     input.addEventListener('change', () => {
@@ -149,7 +204,14 @@ function registerPlayerListeners(el: HTMLElement, getSettings: () => GameSetting
   });
 }
 
-/** Registers change listeners for the board size radio inputs. */
+/**
+ * Registers change listeners for the board size radio inputs.
+ *
+ * @param el - The root settings screen element
+ * @param getSettings - Returns the current settings snapshot
+ * @param update - Persists the updated settings and signals which field changed
+ * @param refs - DOM references for the summary bar
+ */
 function registerSizeListeners(el: HTMLElement, getSettings: () => GameSettings, update: (s: GameSettings, f: string) => void, refs: SettingsDomRefs): void {
   el.querySelectorAll<HTMLInputElement>('input[name="size"]').forEach((input) => {
     input.addEventListener('change', () => {
@@ -162,7 +224,13 @@ function registerSizeListeners(el: HTMLElement, getSettings: () => GameSettings,
   });
 }
 
-/** Registers all radio listeners for theme, player and board size. */
+/**
+ * Registers all radio listeners for theme, player, and board size.
+ *
+ * @param el - The root settings screen element
+ * @param getSettings - Returns the current settings snapshot
+ * @param update - Persists the updated settings and signals which field changed
+ */
 function registerListeners(el: HTMLElement, getSettings: () => GameSettings, update: (s: GameSettings, field: string) => void): void {
   const refs = getSettingsDomRefs(el);
   registerThemeListeners(el, getSettings, update, refs);
@@ -170,7 +238,12 @@ function registerListeners(el: HTMLElement, getSettings: () => GameSettings, upd
   registerSizeListeners(el, getSettings, update, refs);
 }
 
-/** Renders the settings screen with theme, player and board size selection. */
+/**
+ * Renders the settings screen with theme, player, and board size selection.
+ *
+ * @param onStart - Callback invoked with the final settings when the player clicks Start
+ * @returns The fully mounted settings screen `HTMLElement`
+ */
 export function renderSettingsScreen(onStart: (settings: GameSettings) => void): HTMLElement {
   let settings: GameSettings = { theme: 'code-vibes', startingPlayer: 'blue', boardSize: 16 };
   let playerSelected = false;

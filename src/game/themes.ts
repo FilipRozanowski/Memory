@@ -1,12 +1,19 @@
 import type { Theme, ThemeConfig } from '../types';
 
-/** Generates an array of card image paths for the given folder. */
+const CARD_COUNT = 18;
+
+/**
+ * Generates an array of sequential card image paths for a theme folder.
+ *
+ * @param folder - The subfolder name under `/images/cards/`
+ * @param count - The number of card images to generate
+ * @returns An array of image path strings (`card-1.png` … `card-N.png`)
+ */
 function cardImages(folder: string, count: number): string[] {
   return Array.from({ length: count }, (_, i) => `/images/cards/${folder}/card-${i + 1}.png`);
 }
 
-const CARD_COUNT = 18;
-
+/** All available themes mapped by their theme key. */
 export const THEMES: Record<Theme, ThemeConfig> = {
   'code-vibes': {
     name: 'code-vibes',
