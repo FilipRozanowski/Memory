@@ -9,7 +9,12 @@ const GAMEOVER_DELAY_MS = 400;
 const COLOR_BLUE = '#4ab4e8';
 const COLOR_ORANGE = '#e8914a';
 
-/** Builds the white score box HTML used in the gaming header. */
+/**
+ * Builds the white score box HTML used in the gaming header.
+ *
+ * @param state - The current game state containing both player scores
+ * @returns An HTML string for the combined score widget
+ */
 function buildScoreCombinedHtml(state: GameState): string {
   return `
     <div class="score-combined">
@@ -23,7 +28,12 @@ function buildScoreCombinedHtml(state: GameState): string {
     </div>`;
 }
 
-/** Builds the bottom row (current player + exit button) for the gaming header. */
+/**
+ * Builds the bottom row (current player indicator + exit button) for the gaming header.
+ *
+ * @param cur - The player whose turn it currently is
+ * @returns An HTML string for the gaming header's bottom row
+ */
 function buildGamingBottomHtml(cur: Player): string {
   return `
     <div class="game-header__bottom">
@@ -34,7 +44,12 @@ function buildGamingBottomHtml(cur: Player): string {
     </div>`;
 }
 
-/** Builds the gaming-theme header HTML. */
+/**
+ * Builds the full gaming-theme header HTML.
+ *
+ * @param state - The current game state
+ * @returns An HTML string for the gaming header
+ */
 function buildGamingHeader(state: GameState): string {
   return `
     <div class="game-header game-header--gaming">
@@ -43,7 +58,12 @@ function buildGamingHeader(state: GameState): string {
     </div>`;
 }
 
-/** Builds the score badge pair HTML for the code-vibes header. */
+/**
+ * Builds the score badge pair HTML for the code-vibes header.
+ *
+ * @param state - The current game state containing both player scores
+ * @returns An HTML string with two colored score badges
+ */
 function buildScoreBadgesHtml(state: GameState): string {
   return `
     <div class="game-header__scores">
@@ -58,7 +78,12 @@ function buildScoreBadgesHtml(state: GameState): string {
     </div>`;
 }
 
-/** Builds the bottom row (current player + exit button) for the code-vibes header. */
+/**
+ * Builds the bottom row (current player indicator + exit button) for the code-vibes header.
+ *
+ * @param curBg - The CSS background color string for the active player's arrow indicator
+ * @returns An HTML string for the code-vibes header's bottom row
+ */
 function buildCodeVibesBottomHtml(curBg: string): string {
   return `
     <div class="game-header__bottom">
@@ -70,7 +95,12 @@ function buildCodeVibesBottomHtml(curBg: string): string {
     </div>`;
 }
 
-/** Builds the code-vibes-theme header HTML. */
+/**
+ * Builds the full code-vibes-theme header HTML.
+ *
+ * @param state - The current game state
+ * @returns An HTML string for the code-vibes header
+ */
 function buildCodeVibesHeader(state: GameState): string {
   const curBg = state.currentPlayer === 'blue' ? COLOR_BLUE : COLOR_ORANGE;
   return `
@@ -80,12 +110,24 @@ function buildCodeVibesHeader(state: GameState): string {
     </div>`;
 }
 
-/** Dispatches to the correct header builder based on theme. */
+/**
+ * Dispatches to the correct header builder based on the active theme.
+ *
+ * @param state - The current game state
+ * @param isGaming - `true` when the gaming theme is active
+ * @returns An HTML string for the appropriate game header
+ */
 function buildHeader(state: GameState, isGaming: boolean): string {
   return isGaming ? buildGamingHeader(state) : buildCodeVibesHeader(state);
 }
 
-/** Builds the HTML for a single card. */
+/**
+ * Builds the HTML for a single card element.
+ *
+ * @param card - The card data to render
+ * @param theme - The active theme name used to resolve the card-back image path
+ * @returns An HTML string for the card element
+ */
 function buildCardHtml(card: CardData, theme: string): string {
   return `
     <div class="card" data-id="${card.id}">
@@ -101,7 +143,12 @@ function buildCardHtml(card: CardData, theme: string): string {
     </div>`;
 }
 
-/** Builds the full game board HTML. */
+/**
+ * Builds the full game board HTML with a sized grid.
+ *
+ * @param state - The current game state containing all card data and settings
+ * @returns An HTML string for the game board grid
+ */
 function buildBoardHtml(state: GameState): string {
   const cards = state.cards.map((c) => buildCardHtml(c, state.settings.theme)).join('');
   return `
@@ -110,7 +157,12 @@ function buildBoardHtml(state: GameState): string {
     </div>`;
 }
 
-/** Builds the exit confirmation modal HTML. */
+/**
+ * Builds the exit confirmation modal HTML.
+ *
+ * @param isGaming - `true` when the gaming theme is active (affects button labels)
+ * @returns An HTML string for the exit modal dialog
+ */
 function buildExitModalHtml(isGaming: boolean): string {
   return `
     <div class="modal">
@@ -126,7 +178,12 @@ function buildExitModalHtml(isGaming: boolean): string {
     </div>`;
 }
 
-/** Creates and mounts the exit confirmation modal overlay to the app root. */
+/**
+ * Creates and mounts the exit confirmation modal overlay to the app root.
+ *
+ * @param isGaming - `true` when the gaming theme is active
+ * @param onExit - Callback invoked when the player confirms they want to exit
+ */
 function showExitModal(isGaming: boolean, onExit: () => void): void {
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
@@ -139,7 +196,12 @@ function showExitModal(isGaming: boolean, onExit: () => void): void {
   (document.getElementById('app') as HTMLElement).appendChild(overlay);
 }
 
-/** Creates and returns the main screen element, header wrapper and board wrapper. */
+/**
+ * Creates and returns the main screen element, header wrapper, and board wrapper.
+ *
+ * @param state - The initial game state used to build the board HTML
+ * @returns An object with the root element, header wrapper div, and board wrapper div
+ */
 function createScreenElements(state: GameState): {
   el: HTMLElement;
   headerWrap: HTMLDivElement;
@@ -160,7 +222,16 @@ function createScreenElements(state: GameState): {
   return { el, headerWrap, boardWrap };
 }
 
-/** Attaches the card click handler to the board, managing flip and match logic. */
+/**
+ * Attaches the card click handler to the board, managing flip and match logic.
+ *
+ * @param boardWrap - The board wrapper element that receives click events
+ * @param getState - Returns the current game state snapshot
+ * @param setState - Replaces the current game state
+ * @param handleMatch - Called when two flipped cards are a matching pair
+ * @param handleMismatch - Called when two flipped cards do not match
+ * @param updateHeader - Re-renders the header to reflect the updated state
+ */
 function attachCardClickHandler(
   boardWrap: HTMLDivElement,
   getState: () => GameState,
@@ -189,7 +260,14 @@ function attachCardClickHandler(
   });
 }
 
-/** Renders the full game screen and wires up all interactions. */
+/**
+ * Renders the full game screen and wires up all interactions.
+ *
+ * @param initialState - The freshly created game state to start from
+ * @param onGameOver - Callback invoked with the final state when all cards are matched
+ * @param onExit - Callback invoked when the player confirms exiting via the modal
+ * @returns The fully mounted game screen `HTMLElement`
+ */
 export function renderGameScreen(
   initialState: GameState,
   onGameOver: (state: GameState) => void,

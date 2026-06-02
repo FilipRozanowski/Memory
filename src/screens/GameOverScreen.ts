@@ -6,7 +6,12 @@ const CONTINUE_DELAY_MS = 2000;
 const COLOR_BLUE = '#4ab4e8';
 const COLOR_ORANGE = '#e8914a';
 
-/** Builds the gaming-theme final score HTML (white box, colored numbers). */
+/**
+ * Builds the gaming-theme final score HTML (white combined box with colored numbers).
+ *
+ * @param state - The final game state containing both player scores
+ * @returns An HTML string with the score-combined layout
+ */
 function buildGamingScores(state: GameState): string {
   return `
     <div class="score-combined">
@@ -20,7 +25,12 @@ function buildGamingScores(state: GameState): string {
     </div>`;
 }
 
-/** Builds the code-vibes-theme final score HTML (teal box, colored text). */
+/**
+ * Builds the code-vibes-theme final score HTML (two colored score badges).
+ *
+ * @param state - The final game state containing both player scores
+ * @returns An HTML string with two score-badge elements
+ */
 function buildCodeVibesScores(state: GameState): string {
   return `
     <div class="score-badge score-badge--blue score-badge--no-bg">
@@ -33,7 +43,13 @@ function buildCodeVibesScores(state: GameState): string {
     </div>`;
 }
 
-/** Renders the game-over screen and auto-advances to the winner screen. */
+/**
+ * Renders the game-over screen and automatically advances to the winner screen after a delay.
+ *
+ * @param state - The final game state used to display scores
+ * @param onContinue - Callback invoked after `CONTINUE_DELAY_MS` to navigate to the winner screen
+ * @returns The fully mounted game-over screen `HTMLElement`
+ */
 export function renderGameOverScreen(state: GameState, onContinue: () => void): HTMLElement {
   getWinner(state);
 

@@ -1,4 +1,8 @@
-/** Builds the start screen HTML. */
+/**
+ * Builds the start screen HTML string.
+ *
+ * @returns An HTML string containing the eyebrow text, heading, and play button
+ */
 function buildStartHtml(): string {
   return `
     <div class="screen-start__content">
@@ -17,7 +21,12 @@ function buildStartHtml(): string {
     />`;
 }
 
-/** Renders the start screen with a play button. */
+/**
+ * Renders the start screen with a play button wired to the given callback.
+ *
+ * @param onPlay - Callback invoked when the player clicks the play button
+ * @returns The fully mounted start screen `HTMLElement`
+ */
 export function renderStartScreen(onPlay: () => void): HTMLElement {
   const el = document.createElement('div');
   el.className = 'screen-start';

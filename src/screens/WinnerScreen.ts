@@ -15,25 +15,47 @@ interface ConfettiPiece {
   spin: number;
 }
 
-/** Returns the avatar image path based on result and active theme. */
+/**
+ * Returns the avatar image path based on result and active theme.
+ *
+ * @param result - The game result: a `Player` color or `'draw'`
+ * @param isGaming - `true` when the gaming theme is active
+ * @returns The image path string for the appropriate avatar
+ */
 function getAvatarSrc(result: Player | 'draw', isGaming: boolean): string {
   if (result === 'draw') return `/images/icons/player-draw${isGaming ? '-gaming' : ''}.png`;
   return isGaming ? '/images/icons/trophy.png' : `/images/icons/player-${result}.png`;
 }
 
-/** Returns the formatted winner name for display. */
+/**
+ * Returns the formatted winner name for display.
+ *
+ * @param winner - The winning player color
+ * @param isGaming - `true` when the gaming theme is active
+ * @returns A display string such as `'BLUE PLAYER'` or `'Blue Player'`
+ */
 function getWinnerLabel(winner: Player, isGaming: boolean): string {
   return isGaming
     ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} Player`
     : `${winner.toUpperCase()} PLAYER`;
 }
 
-/** Returns the restart button label for the active theme. */
+/**
+ * Returns the restart button label for the active theme.
+ *
+ * @param isGaming - `true` when the gaming theme is active
+ * @returns `'Home'` for gaming, `'Back to start'` for code-vibes
+ */
 function getRestartLabel(isGaming: boolean): string {
   return isGaming ? 'Home' : 'Back to start';
 }
 
-/** Builds the draw result screen HTML. */
+/**
+ * Builds the draw result screen HTML.
+ *
+ * @param isGaming - `true` when the gaming theme is active
+ * @returns An HTML string for the draw outcome layout
+ */
 function buildDrawHtml(isGaming: boolean): string {
   return `
     <p class="screen-winner__label">It's a</p>
@@ -42,7 +64,13 @@ function buildDrawHtml(isGaming: boolean): string {
     <button class="btn btn--secondary" id="btn-restart">${getRestartLabel(isGaming)}</button>`;
 }
 
-/** Builds the winner result screen HTML. */
+/**
+ * Builds the winner result screen HTML including a confetti canvas.
+ *
+ * @param winner - The winning player color
+ * @param isGaming - `true` when the gaming theme is active
+ * @returns An HTML string for the winner outcome layout
+ */
 function buildWinnerHtml(winner: Player, isGaming: boolean): string {
   return `
     <canvas class="screen-winner__confetti" id="confetti-canvas"></canvas>
@@ -54,7 +82,13 @@ function buildWinnerHtml(winner: Player, isGaming: boolean): string {
     <button class="btn btn--secondary" id="btn-restart">${getRestartLabel(isGaming)}</button>`;
 }
 
-/** Renders the winner screen with optional confetti animation. */
+/**
+ * Renders the winner screen with optional confetti animation.
+ *
+ * @param state - The final game state used to determine the winner
+ * @param onRestart - Callback invoked when the restart button is clicked
+ * @returns The fully mounted winner screen `HTMLElement`
+ */
 export function renderWinnerScreen(state: GameState, onRestart: () => void): HTMLElement {
   const result = getWinner(state);
   const isGaming = state.settings.theme === 'gaming';
@@ -72,7 +106,14 @@ export function renderWinnerScreen(state: GameState, onRestart: () => void): HTM
   return el;
 }
 
-/** Creates an array of randomly positioned confetti particles. */
+/**
+ * Creates an array of randomly positioned confetti particles.
+ *
+ * @param count - The number of particles to create
+ * @param W - Canvas width in pixels
+ * @param H - Canvas height in pixels
+ * @returns An array of randomized `ConfettiPiece` objects
+ */
 function createConfettiPieces(count: number, W: number, H: number): ConfettiPiece[] {
   return Array.from({ length: count }, () => ({
     x: Math.random() * W,
@@ -86,7 +127,14 @@ function createConfettiPieces(count: number, W: number, H: number): ConfettiPiec
   }));
 }
 
-/** Draws one animation frame and advances each particle's position. */
+/**
+ * Draws one animation frame and advances each particle's position and rotation.
+ *
+ * @param ctx - The 2D rendering context of the confetti canvas
+ * @param pieces - The current array of confetti particles to render and update
+ * @param W - Canvas width in pixels
+ * @param H - Canvas height in pixels
+ */
 function drawConfettiFrame(ctx: CanvasRenderingContext2D, pieces: ConfettiPiece[], W: number, H: number): void {
   ctx.clearRect(0, 0, W, H);
   pieces.forEach((p) => {
@@ -102,7 +150,11 @@ function drawConfettiFrame(ctx: CanvasRenderingContext2D, pieces: ConfettiPiece[
   });
 }
 
-/** Starts the confetti animation on the given canvas and stops on click. */
+/**
+ * Starts the confetti animation loop on the given canvas and stops it on the next click.
+ *
+ * @param canvas - The `<canvas>` element on which to draw the confetti
+ */
 function startConfetti(canvas: HTMLCanvasElement): void {
   const ctx = canvas.getContext('2d')!;
   const W = (canvas.width = canvas.offsetWidth || window.innerWidth);
