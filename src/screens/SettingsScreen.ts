@@ -110,6 +110,16 @@ function registerListeners(el: HTMLElement, getSettings: () => GameSettings, upd
   const previewImg    = el.querySelector<HTMLImageElement>('.screen-settings__preview img')!;
 
   el.querySelectorAll<HTMLInputElement>('input[name="theme"]').forEach((input) => {
+    const label = input.closest('.radio-option')!;
+
+    label.addEventListener('mouseenter', () => {
+      previewImg.src = THEMES[input.value as Theme].previewImage;
+    });
+
+    label.addEventListener('mouseleave', () => {
+      previewImg.src = THEMES[getSettings().theme].previewImage;
+    });
+
     input.addEventListener('change', () => {
       updateSettings({ ...getSettings(), theme: input.value as Theme }, 'theme');
       el.querySelectorAll('#theme-options .radio-option').forEach((l) => l.classList.remove('is-selected'));
