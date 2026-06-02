@@ -5,11 +5,19 @@ const CONFETTI_COUNT = 60;
 const CONFETTI_COLORS = ['#e84a4a', '#4ab4e8', '#e8d44a', '#4ae877', '#e8914a'];
 const CONFETTI_HEIGHT = 120;
 
-/** Returns the avatar image path based on winner and theme. */
+/** Describes a single confetti particle. */
+interface ConfettiPiece {
+  x: number; y: number;
+  w: number; h: number;
+  color: string;
+  speed: number;
+  angle: number;
+  spin: number;
+}
+
+/** Returns the avatar image path based on result and active theme. */
 function getAvatarSrc(result: Player | 'draw', isGaming: boolean): string {
-  if (result === 'draw') {
-    return `/images/icons/player-draw${isGaming ? '-gaming' : ''}.png`;
-  }
+  if (result === 'draw') return `/images/icons/player-draw${isGaming ? '-gaming' : ''}.png`;
   return isGaming ? '/images/icons/trophy.png' : `/images/icons/player-${result}.png`;
 }
 
@@ -20,7 +28,7 @@ function getWinnerLabel(winner: Player, isGaming: boolean): string {
     : `${winner.toUpperCase()} PLAYER`;
 }
 
-/** Returns the restart button label for the current theme. */
+/** Returns the restart button label for the active theme. */
 function getRestartLabel(isGaming: boolean): string {
   return isGaming ? 'Home' : 'Back to start';
 }
@@ -54,27 +62,19 @@ export function renderWinnerScreen(state: GameState, onRestart: () => void): HTM
 
   const el = document.createElement('div');
   el.className = 'screen-winner';
-
-  el.innerHTML = isDraw
-    ? buildDrawHtml(isGaming)
-    : buildWinnerHtml(result as Player, isGaming);
+  el.innerHTML = isDraw ? buildDrawHtml(isGaming) : buildWinnerHtml(result as Player, isGaming);
 
   if (!isDraw) {
-    const canvas = el.querySelector<HTMLCanvasElement>('#confetti-canvas')!;
-    startConfetti(canvas);
+    startConfetti(el.querySelector<HTMLCanvasElement>('#confetti-canvas')!);
   }
 
   el.querySelector('#btn-restart')!.addEventListener('click', onRestart);
   return el;
 }
 
-/** Animates confetti particles across the canvas. */
-function startConfetti(canvas: HTMLCanvasElement): void {
-  const ctx = canvas.getContext('2d')!;
-  const W = (canvas.width = canvas.offsetWidth || window.innerWidth);
-  const H = (canvas.height = CONFETTI_HEIGHT);
-
-  const pieces = Array.from({ length: CONFETTI_COUNT }, () => ({
+/** Creates an array of randomly positioned confetti particles. */
+function createConfettiPieces(count: number, W: number, H: number): ConfettiPiece[] {
+  return Array.from({ length: count }, () => ({
     x: Math.random() * W,
     y: Math.random() * H - H,
     w: 8 + Math.random() * 8,
@@ -84,26 +84,38 @@ function startConfetti(canvas: HTMLCanvasElement): void {
     angle: Math.random() * Math.PI * 2,
     spin: (Math.random() - 0.5) * 0.15,
   }));
+}
 
+/** Draws one animation frame and advances each particle's position. */
+function drawConfettiFrame(ctx: CanvasRenderingContext2D, pieces: ConfettiPiece[], W: number, H: number): void {
+  ctx.clearRect(0, 0, W, H);
+  pieces.forEach((p) => {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.angle);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    ctx.restore();
+    p.y += p.speed;
+    p.angle += p.spin;
+    if (p.y > H) p.y = -p.h;
+  });
+}
+
+/** Starts the confetti animation on the given canvas and stops on click. */
+function startConfetti(canvas: HTMLCanvasElement): void {
+  const ctx = canvas.getContext('2d')!;
+  const W = (canvas.width = canvas.offsetWidth || window.innerWidth);
+  const H = (canvas.height = CONFETTI_HEIGHT);
+  const pieces = createConfettiPieces(CONFETTI_COUNT, W, H);
   let raf: number;
 
-  const draw = (): void => {
-    ctx.clearRect(0, 0, W, H);
-    pieces.forEach((p) => {
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.angle);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-      ctx.restore();
-      p.y += p.speed;
-      p.angle += p.spin;
-      if (p.y > H) p.y = -p.h;
-    });
-    raf = requestAnimationFrame(draw);
+  const loop = (): void => {
+    drawConfettiFrame(ctx, pieces, W, H);
+    raf = requestAnimationFrame(loop);
   };
 
-  draw();
+  loop();
 
   canvas.closest('.screen-winner')?.addEventListener(
     'click',

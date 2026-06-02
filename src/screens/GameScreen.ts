@@ -1,4 +1,4 @@
-import type { CardData, GameState } from '../types';
+import type { CardData, GameState, Player } from '../types';
 import { flipCard, isGameOver, unflipCards } from '../game/engine';
 import { playerIcon } from '../utils/player-icon';
 
@@ -9,26 +9,64 @@ const GAMEOVER_DELAY_MS = 400;
 const COLOR_BLUE = '#4ab4e8';
 const COLOR_ORANGE = '#e8914a';
 
+/** Builds the white score box HTML used in the gaming header. */
+function buildScoreCombinedHtml(state: GameState): string {
+  return `
+    <div class="score-combined">
+      <span class="score-combined__item">
+        ${playerIcon('orange')} <span style="color:${COLOR_ORANGE};font-weight:700">${state.scores.orange}</span>
+      </span>
+      <span class="score-combined__divider"></span>
+      <span class="score-combined__item">
+        ${playerIcon('blue')} <span style="color:${COLOR_BLUE};font-weight:700">${state.scores.blue}</span>
+      </span>
+    </div>`;
+}
+
+/** Builds the bottom row (current player + exit button) for the gaming header. */
+function buildGamingBottomHtml(cur: Player): string {
+  return `
+    <div class="game-header__bottom">
+      <div class="game-header__current">
+        Current player: ${playerIcon(cur, 20)}
+      </div>
+      <button class="btn btn--exit btn--exit-gaming" id="btn-exit">⏻ Exit game</button>
+    </div>`;
+}
+
 /** Builds the gaming-theme header HTML. */
 function buildGamingHeader(state: GameState): string {
-  const cur = state.currentPlayer;
   return `
     <div class="game-header game-header--gaming">
-      <div class="score-combined">
-        <span class="score-combined__item">
-          ${playerIcon('orange')} <span style="color:${COLOR_ORANGE};font-weight:700">${state.scores.orange}</span>
-        </span>
-        <span class="score-combined__divider"></span>
-        <span class="score-combined__item">
-          ${playerIcon('blue')} <span style="color:${COLOR_BLUE};font-weight:700">${state.scores.blue}</span>
-        </span>
+      ${buildScoreCombinedHtml(state)}
+      ${buildGamingBottomHtml(state.currentPlayer)}
+    </div>`;
+}
+
+/** Builds the score badge pair HTML for the code-vibes header. */
+function buildScoreBadgesHtml(state: GameState): string {
+  return `
+    <div class="game-header__scores">
+      <div class="score-badge score-badge--blue">
+        <span class="score-badge__arrow"></span>
+        Blue ${state.scores.blue}
       </div>
-      <div class="game-header__bottom">
-        <div class="game-header__current">
-          Current player: ${playerIcon(cur, 20)}
-        </div>
-        <button class="btn btn--exit btn--exit-gaming" id="btn-exit">⏻ Exit game</button>
+      <div class="score-badge score-badge--orange">
+        <span class="score-badge__arrow"></span>
+        Orange ${state.scores.orange}
       </div>
+    </div>`;
+}
+
+/** Builds the bottom row (current player + exit button) for the code-vibes header. */
+function buildCodeVibesBottomHtml(curBg: string): string {
+  return `
+    <div class="game-header__bottom">
+      <div class="game-header__current">
+        Current player:
+        <span class="player-arrow" style="background:${curBg}"></span>
+      </div>
+      <button class="btn btn--exit" id="btn-exit">⏻ Exit game</button>
     </div>`;
 }
 
@@ -37,23 +75,8 @@ function buildCodeVibesHeader(state: GameState): string {
   const curBg = state.currentPlayer === 'blue' ? COLOR_BLUE : COLOR_ORANGE;
   return `
     <div class="game-header game-header--code-vibes">
-      <div class="game-header__scores">
-        <div class="score-badge score-badge--blue">
-          <span class="score-badge__arrow"></span>
-          Blue ${state.scores.blue}
-        </div>
-        <div class="score-badge score-badge--orange">
-          <span class="score-badge__arrow"></span>
-          Orange ${state.scores.orange}
-        </div>
-      </div>
-      <div class="game-header__bottom">
-        <div class="game-header__current">
-          Current player:
-          <span class="player-arrow" style="background:${curBg}"></span>
-        </div>
-        <button class="btn btn--exit" id="btn-exit">⏻ Exit game</button>
-      </div>
+      ${buildScoreBadgesHtml(state)}
+      ${buildCodeVibesBottomHtml(curBg)}
     </div>`;
 }
 
@@ -78,7 +101,7 @@ function buildCardHtml(card: CardData, theme: string): string {
     </div>`;
 }
 
-/** Builds the full board HTML. */
+/** Builds the full game board HTML. */
 function buildBoardHtml(state: GameState): string {
   const cards = state.cards.map((c) => buildCardHtml(c, state.settings.theme)).join('');
   return `
@@ -87,7 +110,7 @@ function buildBoardHtml(state: GameState): string {
     </div>`;
 }
 
-/** Returns the exit confirmation modal HTML. */
+/** Builds the exit confirmation modal HTML. */
 function buildExitModalHtml(isGaming: boolean): string {
   return `
     <div class="modal">
@@ -103,7 +126,7 @@ function buildExitModalHtml(isGaming: boolean): string {
     </div>`;
 }
 
-/** Creates and attaches the exit confirmation modal overlay. */
+/** Creates and mounts the exit confirmation modal overlay to the app root. */
 function showExitModal(isGaming: boolean, onExit: () => void): void {
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
@@ -116,15 +139,12 @@ function showExitModal(isGaming: boolean, onExit: () => void): void {
   (document.getElementById('app') as HTMLElement).appendChild(overlay);
 }
 
-/** Renders the full game screen and wires up all interactions. */
-export function renderGameScreen(
-  initialState: GameState,
-  onGameOver: (state: GameState) => void,
-  onExit: () => void
-): HTMLElement {
-  let state = initialState;
-  const isGaming = state.settings.theme === 'gaming';
-
+/** Creates and returns the main screen element, header wrapper and board wrapper. */
+function createScreenElements(state: GameState): {
+  el: HTMLElement;
+  headerWrap: HTMLDivElement;
+  boardWrap: HTMLDivElement;
+} {
   const el = document.createElement('div');
   el.className = 'screen-game';
 
@@ -137,6 +157,48 @@ export function renderGameScreen(
   el.appendChild(headerWrap);
   el.appendChild(boardWrap);
 
+  return { el, headerWrap, boardWrap };
+}
+
+/** Attaches the card click handler to the board, managing flip and match logic. */
+function attachCardClickHandler(
+  boardWrap: HTMLDivElement,
+  getState: () => GameState,
+  setState: (s: GameState) => void,
+  handleMatch: (prev: number[], id: number) => void,
+  handleMismatch: () => void,
+  updateHeader: () => void
+): void {
+  boardWrap.addEventListener('click', (e) => {
+    const target = (e.target as HTMLElement).closest<HTMLElement>('.card');
+    if (!target || target.classList.contains('is-flipped') || target.classList.contains('is-matched')) return;
+    if (getState().isLocked) return;
+
+    const id = Number(target.dataset.id);
+    const prevFlipped = [...getState().flippedCards];
+    setState(flipCard(getState(), id));
+    target.classList.add('is-flipped');
+
+    if (!getState().isLocked && getState().flippedCards.length === 0) {
+      handleMatch(prevFlipped, id);
+    } else if (getState().isLocked) {
+      handleMismatch();
+    } else {
+      updateHeader();
+    }
+  });
+}
+
+/** Renders the full game screen and wires up all interactions. */
+export function renderGameScreen(
+  initialState: GameState,
+  onGameOver: (state: GameState) => void,
+  onExit: () => void
+): HTMLElement {
+  let state = initialState;
+  const isGaming = state.settings.theme === 'gaming';
+  const { el, headerWrap, boardWrap } = createScreenElements(state);
+
   const cardEl = (id: number): HTMLElement =>
     boardWrap.querySelector<HTMLElement>(`.card[data-id="${id}"]`)!;
 
@@ -146,9 +208,8 @@ export function renderGameScreen(
   };
 
   const handleMatch = (prevFlipped: number[], id: number): void => {
-    const matchedIds = [prevFlipped[0], id];
     setTimeout(() => {
-      matchedIds.forEach((mid) => cardEl(mid).classList.add('is-matched'));
+      [prevFlipped[0], id].forEach((mid) => cardEl(mid).classList.add('is-matched'));
       updateHeader();
       if (isGameOver(state)) setTimeout(() => onGameOver(state), GAMEOVER_DELAY_MS);
     }, MATCH_DELAY_MS);
@@ -165,24 +226,14 @@ export function renderGameScreen(
     }, UNMATCH_DELAY_MS);
   };
 
-  boardWrap.addEventListener('click', (e) => {
-    const target = (e.target as HTMLElement).closest<HTMLElement>('.card');
-    if (!target || target.classList.contains('is-flipped') || target.classList.contains('is-matched')) return;
-    if (state.isLocked) return;
-
-    const id = Number(target.dataset.id);
-    const prevFlipped = [...state.flippedCards];
-    state = flipCard(state, id);
-    target.classList.add('is-flipped');
-
-    if (!state.isLocked && state.flippedCards.length === 0) {
-      handleMatch(prevFlipped, id);
-    } else if (state.isLocked) {
-      handleMismatch();
-    } else {
-      updateHeader();
-    }
-  });
+  attachCardClickHandler(
+    boardWrap,
+    () => state,
+    (s) => { state = s; },
+    handleMatch,
+    handleMismatch,
+    updateHeader
+  );
 
   updateHeader();
   return el;

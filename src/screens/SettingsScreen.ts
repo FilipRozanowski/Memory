@@ -7,6 +7,14 @@ const BOARD_SIZES: BoardSize[] = [16, 24, 36];
 const PLACEHOLDER_PLAYER = 'Player';
 const PLACEHOLDER_SIZE = 'Board size';
 
+/** Holds references to summary DOM elements and the preview image. */
+interface SettingsDomRefs {
+  summaryTheme: HTMLElement;
+  summaryPlayer: HTMLElement;
+  summarySize: HTMLElement;
+  previewImg: HTMLImageElement;
+}
+
 /** Capitalizes the first letter of a string. */
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -21,7 +29,7 @@ function buildRadioOption(name: string, value: string, label: string, isSelected
     </label>`;
 }
 
-/** Builds the theme selection group HTML. */
+/** Builds the theme selection group HTML with the current theme pre-selected. */
 function buildThemeOptions(settings: GameSettings): string {
   const options = THEMES_LIST.map((t) =>
     buildRadioOption('theme', t, THEMES[t].label, t === settings.theme)
@@ -36,7 +44,7 @@ function buildThemeOptions(settings: GameSettings): string {
     </div>`;
 }
 
-/** Builds the starting player selection group HTML — no pre-selection. */
+/** Builds the starting player selection group HTML with no pre-selection. */
 function buildPlayerOptions(): string {
   const players: Player[] = ['blue', 'orange'];
   const options = players.map((p) =>
@@ -52,7 +60,7 @@ function buildPlayerOptions(): string {
     </div>`;
 }
 
-/** Builds the board size selection group HTML — no pre-selection. */
+/** Builds the board size selection group HTML with no pre-selection. */
 function buildSizeOptions(): string {
   const options = BOARD_SIZES.map((s) =>
     buildRadioOption('size', String(s), `${s} cards`, false)
@@ -67,7 +75,7 @@ function buildSizeOptions(): string {
     </div>`;
 }
 
-/** Builds the summary bar with placeholders for unselected fields. */
+/** Builds the summary bar with placeholders for fields not yet selected. */
 function buildSummaryBar(settings: GameSettings): string {
   return `
     <div class="screen-settings__actions">
@@ -102,55 +110,67 @@ function buildSettingsHtml(settings: GameSettings): string {
     </div>`;
 }
 
-/** Registers all radio input change listeners and wires up summary + preview updates. */
-function registerListeners(el: HTMLElement, getSettings: () => GameSettings, updateSettings: (s: GameSettings, field: string) => void): void {
-  const summaryTheme  = el.querySelector<HTMLElement>('#summary-theme')!;
-  const summaryPlayer = el.querySelector<HTMLElement>('#summary-player')!;
-  const summarySize   = el.querySelector<HTMLElement>('#summary-size')!;
-  const previewImg    = el.querySelector<HTMLImageElement>('.screen-settings__preview img')!;
+/** Queries and returns all relevant DOM refs from the settings element. */
+function getSettingsDomRefs(el: HTMLElement): SettingsDomRefs {
+  return {
+    summaryTheme:  el.querySelector<HTMLElement>('#summary-theme')!,
+    summaryPlayer: el.querySelector<HTMLElement>('#summary-player')!,
+    summarySize:   el.querySelector<HTMLElement>('#summary-size')!,
+    previewImg:    el.querySelector<HTMLImageElement>('.screen-settings__preview img')!,
+  };
+}
 
+/** Registers hover and change listeners for the theme radio inputs. */
+function registerThemeListeners(el: HTMLElement, getSettings: () => GameSettings, update: (s: GameSettings, f: string) => void, refs: SettingsDomRefs): void {
   el.querySelectorAll<HTMLInputElement>('input[name="theme"]').forEach((input) => {
     const label = input.closest('.radio-option')!;
-
-    label.addEventListener('mouseenter', () => {
-      previewImg.src = THEMES[input.value as Theme].previewImage;
-    });
-
-    label.addEventListener('mouseleave', () => {
-      previewImg.src = THEMES[getSettings().theme].previewImage;
-    });
-
+    label.addEventListener('mouseenter', () => { refs.previewImg.src = THEMES[input.value as Theme].previewImage; });
+    label.addEventListener('mouseleave', () => { refs.previewImg.src = THEMES[getSettings().theme].previewImage; });
     input.addEventListener('change', () => {
-      updateSettings({ ...getSettings(), theme: input.value as Theme }, 'theme');
+      update({ ...getSettings(), theme: input.value as Theme }, 'theme');
       el.querySelectorAll('#theme-options .radio-option').forEach((l) => l.classList.remove('is-selected'));
       input.closest('.radio-option')?.classList.add('is-selected');
-      summaryTheme.textContent = THEMES[getSettings().theme].label;
-      previewImg.src = THEMES[getSettings().theme].previewImage;
-    });
-  });
-
-  el.querySelectorAll<HTMLInputElement>('input[name="player"]').forEach((input) => {
-    input.addEventListener('change', () => {
-      updateSettings({ ...getSettings(), startingPlayer: input.value as Player }, 'player');
-      el.querySelectorAll('#player-options .radio-option').forEach((l) => l.classList.remove('is-selected'));
-      input.closest('.radio-option')?.classList.add('is-selected');
-      summaryPlayer.textContent = capitalize(getSettings().startingPlayer);
-      summaryPlayer.classList.remove('summary-placeholder');
-    });
-  });
-
-  el.querySelectorAll<HTMLInputElement>('input[name="size"]').forEach((input) => {
-    input.addEventListener('change', () => {
-      updateSettings({ ...getSettings(), boardSize: Number(input.value) as BoardSize }, 'size');
-      el.querySelectorAll('#size-options .radio-option').forEach((l) => l.classList.remove('is-selected'));
-      input.closest('.radio-option')?.classList.add('is-selected');
-      summarySize.textContent = `${getSettings().boardSize} cards`;
-      summarySize.classList.remove('summary-placeholder');
+      refs.summaryTheme.textContent = THEMES[getSettings().theme].label;
+      refs.previewImg.src = THEMES[getSettings().theme].previewImage;
     });
   });
 }
 
-/** Renders the settings screen with theme, player, and board size selection. */
+/** Registers change listeners for the player radio inputs. */
+function registerPlayerListeners(el: HTMLElement, getSettings: () => GameSettings, update: (s: GameSettings, f: string) => void, refs: SettingsDomRefs): void {
+  el.querySelectorAll<HTMLInputElement>('input[name="player"]').forEach((input) => {
+    input.addEventListener('change', () => {
+      update({ ...getSettings(), startingPlayer: input.value as Player }, 'player');
+      el.querySelectorAll('#player-options .radio-option').forEach((l) => l.classList.remove('is-selected'));
+      input.closest('.radio-option')?.classList.add('is-selected');
+      refs.summaryPlayer.textContent = capitalize(getSettings().startingPlayer);
+      refs.summaryPlayer.classList.remove('summary-placeholder');
+    });
+  });
+}
+
+/** Registers change listeners for the board size radio inputs. */
+function registerSizeListeners(el: HTMLElement, getSettings: () => GameSettings, update: (s: GameSettings, f: string) => void, refs: SettingsDomRefs): void {
+  el.querySelectorAll<HTMLInputElement>('input[name="size"]').forEach((input) => {
+    input.addEventListener('change', () => {
+      update({ ...getSettings(), boardSize: Number(input.value) as BoardSize }, 'size');
+      el.querySelectorAll('#size-options .radio-option').forEach((l) => l.classList.remove('is-selected'));
+      input.closest('.radio-option')?.classList.add('is-selected');
+      refs.summarySize.textContent = `${getSettings().boardSize} cards`;
+      refs.summarySize.classList.remove('summary-placeholder');
+    });
+  });
+}
+
+/** Registers all radio listeners for theme, player and board size. */
+function registerListeners(el: HTMLElement, getSettings: () => GameSettings, update: (s: GameSettings, field: string) => void): void {
+  const refs = getSettingsDomRefs(el);
+  registerThemeListeners(el, getSettings, update, refs);
+  registerPlayerListeners(el, getSettings, update, refs);
+  registerSizeListeners(el, getSettings, update, refs);
+}
+
+/** Renders the settings screen with theme, player and board size selection. */
 export function renderSettingsScreen(onStart: (settings: GameSettings) => void): HTMLElement {
   let settings: GameSettings = { theme: 'code-vibes', startingPlayer: 'blue', boardSize: 16 };
   let playerSelected = false;
@@ -163,20 +183,14 @@ export function renderSettingsScreen(onStart: (settings: GameSettings) => void):
   const btnStart = el.querySelector<HTMLButtonElement>('#btn-start')!;
   btnStart.disabled = true;
 
-  const updateStartButton = (): void => {
-    btnStart.disabled = !(playerSelected && sizeSelected);
-  };
+  const updateStartButton = (): void => { btnStart.disabled = !(playerSelected && sizeSelected); };
 
-  registerListeners(
-    el,
-    () => settings,
-    (updated, field) => {
-      settings = updated;
-      if (field === 'player') { playerSelected = true; }
-      if (field === 'size')   { sizeSelected = true; }
-      updateStartButton();
-    }
-  );
+  registerListeners(el, () => settings, (updated, field) => {
+    settings = updated;
+    if (field === 'player') playerSelected = true;
+    if (field === 'size')   sizeSelected = true;
+    updateStartButton();
+  });
 
   btnStart.addEventListener('click', () => onStart(settings));
   return el;
