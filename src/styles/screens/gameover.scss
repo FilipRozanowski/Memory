@@ -8,9 +8,6 @@
   justify-content: center;
   gap: $spacing-lg;
   background-color: var(--color-bg);
-  max-width: 1440px;
-  width: 100%;
-  margin: 0 auto;
 
   &__title {
     font-size: clamp(3rem, 12vw, 8rem);
