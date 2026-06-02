@@ -1,5 +1,4 @@
 import type { GameState } from '../types';
-import { getWinner } from '../game/engine';
 import { playerIcon } from '../utils/player-icon';
 
 const CONTINUE_DELAY_MS = 2000;
@@ -44,6 +43,19 @@ function buildCodeVibesScores(state: GameState): string {
 }
 
 /**
+ * Builds the inner HTML for the game-over screen.
+ *
+ * @param scoresHtml - Pre-built HTML string for the scores section
+ * @returns An HTML string with the title, label, and scores wrapper
+ */
+function buildGameOverHtml(scoresHtml: string): string {
+  return `
+    <h1 class="screen-gameover__title">Game over</h1>
+    <p class="screen-gameover__label">Final score</p>
+    <div class="screen-gameover__scores">${scoresHtml}</div>`;
+}
+
+/**
  * Renders the game-over screen and automatically advances to the winner screen after a delay.
  *
  * @param state - The final game state used to display scores
@@ -51,22 +63,11 @@ function buildCodeVibesScores(state: GameState): string {
  * @returns The fully mounted game-over screen `HTMLElement`
  */
 export function renderGameOverScreen(state: GameState, onContinue: () => void): HTMLElement {
-  getWinner(state);
-
   const isGaming = state.settings.theme === 'gaming';
   const scoresHtml = isGaming ? buildGamingScores(state) : buildCodeVibesScores(state);
-
-  const el = document.createElement('div');
+  const el = document.createElement('main');
   el.className = 'screen-gameover';
-
-  el.innerHTML = `
-    <h1 class="screen-gameover__title">Game over</h1>
-    <p class="screen-gameover__label">Final score</p>
-    <div class="screen-gameover__scores">
-      ${scoresHtml}
-    </div>
-  `;
-
+  el.innerHTML = buildGameOverHtml(scoresHtml);
   setTimeout(() => onContinue(), CONTINUE_DELAY_MS);
   return el;
 }
