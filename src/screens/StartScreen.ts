@@ -28,7 +28,7 @@ function buildStartHtml(): string {
  * @returns The fully mounted start screen `HTMLElement`
  */
 export function renderStartScreen(onPlay: () => void): HTMLElement {
-  const el = document.createElement('div');
+  const el = document.createElement('main');
   el.className = 'screen-start';
   el.innerHTML = buildStartHtml();
   el.querySelector('#btn-play')!.addEventListener('click', onPlay);

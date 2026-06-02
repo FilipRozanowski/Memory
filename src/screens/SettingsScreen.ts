@@ -43,29 +43,29 @@ function buildRadioOption(name: string, value: string, label: string, isSelected
 }
 
 /**
- * Builds the theme selection group HTML with the current theme pre-selected.
+ * Builds the theme selection fieldset HTML with the current theme pre-selected.
  *
  * @param settings - The current game settings used to mark the active theme
- * @returns An HTML string for the full theme radio group
+ * @returns An HTML string for the full theme radio fieldset
  */
 function buildThemeOptions(settings: GameSettings): string {
   const options = THEMES_LIST.map((t) =>
     buildRadioOption('theme', t, THEMES[t].label, t === settings.theme)
   ).join('');
   return `
-    <div class="settings-group">
-      <div class="settings-group__label">
+    <fieldset class="settings-group">
+      <legend class="settings-group__label">
         <img src="/images/icons/icon-theme.png" class="settings-group__icon settings-group__icon--theme" alt="Theme icon" />
         <span>Game themes</span>
-      </div>
+      </legend>
       <div class="settings-group__options" id="theme-options">${options}</div>
-    </div>`;
+    </fieldset>`;
 }
 
 /**
- * Builds the starting player selection group HTML with no pre-selection.
+ * Builds the starting player selection fieldset HTML with no pre-selection.
  *
- * @returns An HTML string for the full player radio group
+ * @returns An HTML string for the full player radio fieldset
  */
 function buildPlayerOptions(): string {
   const players: Player[] = ['blue', 'orange'];
@@ -73,50 +73,50 @@ function buildPlayerOptions(): string {
     buildRadioOption('player', p, capitalize(p), false)
   ).join('');
   return `
-    <div class="settings-group">
-      <div class="settings-group__label">
+    <fieldset class="settings-group">
+      <legend class="settings-group__label">
         <img src="/images/icons/icon-player.png" class="settings-group__icon settings-group__icon--player" alt="Player icon" />
         <span>Choose player</span>
-      </div>
+      </legend>
       <div class="settings-group__options" id="player-options">${options}</div>
-    </div>`;
+    </fieldset>`;
 }
 
 /**
- * Builds the board size selection group HTML with no pre-selection.
+ * Builds the board size selection fieldset HTML with no pre-selection.
  *
- * @returns An HTML string for the full board size radio group
+ * @returns An HTML string for the full board size radio fieldset
  */
 function buildSizeOptions(): string {
   const options = BOARD_SIZES.map((s) =>
     buildRadioOption('size', String(s), `${s} cards`, false)
   ).join('');
   return `
-    <div class="settings-group">
-      <div class="settings-group__label">
+    <fieldset class="settings-group">
+      <legend class="settings-group__label">
         <img src="/images/icons/icon-board.png" class="settings-group__icon settings-group__icon--board" alt="Board icon" />
         <span>Board size</span>
-      </div>
+      </legend>
       <div class="settings-group__options" id="size-options">${options}</div>
-    </div>`;
+    </fieldset>`;
 }
 
 /**
- * Builds the summary bar with the active theme and placeholders for unselected fields.
+ * Builds the summary footer with the active theme and placeholders for unselected fields.
  *
  * @param settings - The current game settings used to show the active theme label
- * @returns An HTML string for the summary/actions bar
+ * @returns An HTML string for the summary/actions footer
  */
 function buildSummaryBar(settings: GameSettings): string {
   return `
-    <div class="screen-settings__actions">
+    <footer class="screen-settings__actions">
       <span id="summary-theme">${THEMES[settings.theme].label}</span>
       <span class="divider">/</span>
       <span id="summary-player" class="summary-placeholder">${PLACEHOLDER_PLAYER}</span>
       <span class="divider">/</span>
       <span id="summary-size" class="summary-placeholder">${PLACEHOLDER_SIZE}</span>
       <button class="btn btn--primary" id="btn-start">▶ Start</button>
-    </div>`;
+    </footer>`;
 }
 
 /**
@@ -128,7 +128,7 @@ function buildSummaryBar(settings: GameSettings): string {
 function buildSettingsHtml(settings: GameSettings): string {
   return `
     <div class="screen-settings__inner">
-      <div class="screen-settings__left">
+      <section class="screen-settings__left">
         <div class="screen-settings__title-wrap">
           <h1 class="screen-settings__title">Settings</h1>
           <div class="screen-settings__title-line"></div>
@@ -136,13 +136,13 @@ function buildSettingsHtml(settings: GameSettings): string {
         ${buildThemeOptions(settings)}
         ${buildPlayerOptions()}
         ${buildSizeOptions()}
-      </div>
-      <div class="screen-settings__right">
+      </section>
+      <aside class="screen-settings__right">
         <div class="screen-settings__preview">
           <img src="${THEMES[settings.theme].previewImage}" alt="Theme preview" />
         </div>
         ${buildSummaryBar(settings)}
-      </div>
+      </aside>
     </div>`;
 }
 
@@ -239,6 +239,21 @@ function registerListeners(el: HTMLElement, getSettings: () => GameSettings, upd
 }
 
 /**
+ * Wires the start button and all radio listeners to the settings screen element.
+ *
+ * @param el - The root settings screen element
+ * @param getSettings - Returns the current settings snapshot
+ * @param onUpdate - Called whenever a setting changes, with the updated settings and field name
+ * @param onStart - Callback invoked when the player clicks Start
+ */
+function wireSettingsScreen(el: HTMLElement, getSettings: () => GameSettings, onUpdate: (s: GameSettings, field: string) => void, onStart: (s: GameSettings) => void): void {
+  const btn = el.querySelector<HTMLButtonElement>('#btn-start')!;
+  btn.disabled = true;
+  registerListeners(el, getSettings, onUpdate);
+  btn.addEventListener('click', () => onStart(getSettings()));
+}
+
+/**
  * Renders the settings screen with theme, player, and board size selection.
  *
  * @param onStart - Callback invoked with the final settings when the player clicks Start
@@ -248,23 +263,14 @@ export function renderSettingsScreen(onStart: (settings: GameSettings) => void):
   let settings: GameSettings = { theme: 'code-vibes', startingPlayer: 'blue', boardSize: 16 };
   let playerSelected = false;
   let sizeSelected = false;
-
-  const el = document.createElement('div');
+  const el = document.createElement('main');
   el.className = 'screen-settings';
   el.innerHTML = buildSettingsHtml(settings);
-
-  const btnStart = el.querySelector<HTMLButtonElement>('#btn-start')!;
-  btnStart.disabled = true;
-
-  const updateStartButton = (): void => { btnStart.disabled = !(playerSelected && sizeSelected); };
-
-  registerListeners(el, () => settings, (updated, field) => {
+  wireSettingsScreen(el, () => settings, (updated, field) => {
     settings = updated;
     if (field === 'player') playerSelected = true;
     if (field === 'size')   sizeSelected = true;
-    updateStartButton();
-  });
-
-  btnStart.addEventListener('click', () => onStart(settings));
+    el.querySelector<HTMLButtonElement>('#btn-start')!.disabled = !(playerSelected && sizeSelected);
+  }, onStart);
   return el;
 }

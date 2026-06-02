@@ -37,6 +37,17 @@ ol {
   list-style: none;
 }
 
+fieldset {
+  border: none;
+  min-inline-size: 0;
+}
+
+dialog {
+  border: none;
+  max-width: unset;
+  max-height: unset;
+}
+
 img,
 svg {
   display: block;

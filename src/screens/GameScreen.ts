@@ -122,7 +122,7 @@ function buildHeader(state: GameState, isGaming: boolean): string {
 }
 
 /**
- * Builds the HTML for a single card element.
+ * Builds the HTML for a single card list item.
  *
  * @param card - The card data to render
  * @param theme - The active theme name used to resolve the card-back image path
@@ -130,7 +130,7 @@ function buildHeader(state: GameState, isGaming: boolean): string {
  */
 function buildCardHtml(card: CardData, theme: string): string {
   return `
-    <div class="card" data-id="${card.id}">
+    <li class="card" data-id="${card.id}">
       <div class="card__inner">
         <div class="card__back">
           <img src="/images/cards/${theme}/card-back.png"
@@ -140,11 +140,11 @@ function buildCardHtml(card: CardData, theme: string): string {
           <img src="${card.imageSrc}" alt="card" />
         </div>
       </div>
-    </div>`;
+    </li>`;
 }
 
 /**
- * Builds the full game board HTML with a sized grid.
+ * Builds the full game board HTML with a sized grid list.
  *
  * @param state - The current game state containing all card data and settings
  * @returns An HTML string for the game board grid
@@ -152,9 +152,9 @@ function buildCardHtml(card: CardData, theme: string): string {
 function buildBoardHtml(state: GameState): string {
   const cards = state.cards.map((c) => buildCardHtml(c, state.settings.theme)).join('');
   return `
-    <div class="game-board__grid game-board__grid--${state.settings.boardSize}">
+    <ul class="game-board__grid game-board__grid--${state.settings.boardSize}">
       ${cards}
-    </div>`;
+    </ul>`;
 }
 
 /**
@@ -179,84 +179,140 @@ function buildExitModalHtml(isGaming: boolean): string {
 }
 
 /**
- * Creates and mounts the exit confirmation modal overlay to the app root.
+ * Creates and mounts the exit confirmation modal dialog to the app root.
  *
  * @param isGaming - `true` when the gaming theme is active
  * @param onExit - Callback invoked when the player confirms they want to exit
  */
 function showExitModal(isGaming: boolean, onExit: () => void): void {
-  const overlay = document.createElement('div');
+  const overlay = document.createElement('dialog');
+  overlay.setAttribute('open', '');
   overlay.className = 'modal-overlay';
   overlay.innerHTML = buildExitModalHtml(isGaming);
   overlay.querySelector('#modal-back')!.addEventListener('click', () => overlay.remove());
-  overlay.querySelector('#modal-exit')!.addEventListener('click', () => {
-    overlay.remove();
-    onExit();
-  });
+  overlay.querySelector('#modal-exit')!.addEventListener('click', () => { overlay.remove(); onExit(); });
   (document.getElementById('app') as HTMLElement).appendChild(overlay);
 }
 
 /**
- * Creates and returns the main screen element, header wrapper, and board wrapper.
+ * Creates and returns the main screen element, header element, and board section.
  *
  * @param state - The initial game state used to build the board HTML
- * @returns An object with the root element, header wrapper div, and board wrapper div
+ * @returns An object with the root element, header element, and board section
  */
-function createScreenElements(state: GameState): {
-  el: HTMLElement;
-  headerWrap: HTMLDivElement;
-  boardWrap: HTMLDivElement;
-} {
-  const el = document.createElement('div');
+function createScreenElements(state: GameState): { el: HTMLElement; headerWrap: HTMLElement; boardWrap: HTMLElement } {
+  const el = document.createElement('main');
   el.className = 'screen-game';
-
-  const headerWrap = document.createElement('div');
-
-  const boardWrap = document.createElement('div');
+  const headerWrap = document.createElement('header');
+  const boardWrap = document.createElement('section');
   boardWrap.className = 'game-board';
   boardWrap.innerHTML = buildBoardHtml(state);
-
   el.appendChild(headerWrap);
   el.appendChild(boardWrap);
-
   return { el, headerWrap, boardWrap };
 }
 
 /**
- * Attaches the card click handler to the board, managing flip and match logic.
+ * Returns a callback that re-renders the header and re-wires the exit button.
  *
- * @param boardWrap - The board wrapper element that receives click events
+ * @param headerWrap - The header element to update
+ * @param getState - Returns the current game state snapshot
+ * @param isGaming - `true` when the gaming theme is active
+ * @param onExit - Callback passed to the exit modal on confirmation
+ * @returns A zero-argument function that refreshes the header
+ */
+function makeUpdateHeader(headerWrap: HTMLElement, getState: () => GameState, isGaming: boolean, onExit: () => void): () => void {
+  return () => {
+    headerWrap.innerHTML = buildHeader(getState(), isGaming);
+    headerWrap.querySelector('#btn-exit')!.addEventListener('click', () => showExitModal(isGaming, onExit));
+  };
+}
+
+/**
+ * Unflips mismatched cards in the DOM and updates the header after the delay.
+ *
+ * @param getState - Returns the current game state snapshot
+ * @param setState - Replaces the current game state
+ * @param cardEl - Returns the DOM element for a given card ID
+ * @param updateHeader - Re-renders the header to reflect the updated state
+ */
+function applyMismatchDom(getState: () => GameState, setState: (s: GameState) => void, cardEl: (id: number) => HTMLElement, updateHeader: () => void): void {
+  const [firstId, secondId] = getState().flippedCards;
+  setState(unflipCards(getState()));
+  [firstId, secondId].forEach((id) => cardEl(id).classList.remove('is-flipped'));
+  updateHeader();
+}
+
+/**
+ * Returns a callback that handles a mismatch: updates the header, then unflips after a delay.
+ *
+ * @param getState - Returns the current game state snapshot
+ * @param setState - Replaces the current game state
+ * @param cardEl - Returns the DOM element for a given card ID
+ * @param updateHeader - Re-renders the header to reflect the updated state
+ * @returns A zero-argument function to call on mismatch
+ */
+function makeHandleMismatch(getState: () => GameState, setState: (s: GameState) => void, cardEl: (id: number) => HTMLElement, updateHeader: () => void): () => void {
+  return () => {
+    updateHeader();
+    setTimeout(() => applyMismatchDom(getState, setState, cardEl, updateHeader), UNMATCH_DELAY_MS);
+  };
+}
+
+/**
+ * Returns a callback that handles a match: marks cards matched, updates header, checks game over.
+ *
+ * @param getState - Returns the current game state snapshot
+ * @param cardEl - Returns the DOM element for a given card ID
+ * @param updateHeader - Re-renders the header to reflect the updated state
+ * @param onGameOver - Callback invoked with the final state when all cards are matched
+ * @returns A function accepting the previously flipped IDs and the newly matched card ID
+ */
+function makeHandleMatch(getState: () => GameState, cardEl: (id: number) => HTMLElement, updateHeader: () => void, onGameOver: (s: GameState) => void): (prevFlipped: number[], id: number) => void {
+  return (prevFlipped, id) => {
+    setTimeout(() => {
+      [prevFlipped[0], id].forEach((mid) => cardEl(mid).classList.add('is-matched'));
+      updateHeader();
+      if (isGameOver(getState())) setTimeout(() => onGameOver(getState()), GAMEOVER_DELAY_MS);
+    }, MATCH_DELAY_MS);
+  };
+}
+
+/**
+ * Processes a valid card flip: flips the card, advances state, and dispatches match/mismatch/turn.
+ *
+ * @param target - The clicked card element
  * @param getState - Returns the current game state snapshot
  * @param setState - Replaces the current game state
  * @param handleMatch - Called when two flipped cards are a matching pair
  * @param handleMismatch - Called when two flipped cards do not match
  * @param updateHeader - Re-renders the header to reflect the updated state
  */
-function attachCardClickHandler(
-  boardWrap: HTMLDivElement,
-  getState: () => GameState,
-  setState: (s: GameState) => void,
-  handleMatch: (prev: number[], id: number) => void,
-  handleMismatch: () => void,
-  updateHeader: () => void
-): void {
+function resolveFlip(target: HTMLElement, getState: () => GameState, setState: (s: GameState) => void, handleMatch: (prev: number[], id: number) => void, handleMismatch: () => void, updateHeader: () => void): void {
+  const id = Number(target.dataset.id);
+  const prevFlipped = [...getState().flippedCards];
+  setState(flipCard(getState(), id));
+  target.classList.add('is-flipped');
+  if (!getState().isLocked && getState().flippedCards.length === 0) handleMatch(prevFlipped, id);
+  else if (getState().isLocked) handleMismatch();
+  else updateHeader();
+}
+
+/**
+ * Attaches the card click handler to the board, guarding against locked state and already-flipped cards.
+ *
+ * @param boardWrap - The board element that receives click events
+ * @param getState - Returns the current game state snapshot
+ * @param setState - Replaces the current game state
+ * @param handleMatch - Called when two flipped cards are a matching pair
+ * @param handleMismatch - Called when two flipped cards do not match
+ * @param updateHeader - Re-renders the header to reflect the updated state
+ */
+function attachCardClickHandler(boardWrap: HTMLElement, getState: () => GameState, setState: (s: GameState) => void, handleMatch: (prev: number[], id: number) => void, handleMismatch: () => void, updateHeader: () => void): void {
   boardWrap.addEventListener('click', (e) => {
     const target = (e.target as HTMLElement).closest<HTMLElement>('.card');
     if (!target || target.classList.contains('is-flipped') || target.classList.contains('is-matched')) return;
-    if (getState().isLocked) return;
-
-    const id = Number(target.dataset.id);
-    const prevFlipped = [...getState().flippedCards];
-    setState(flipCard(getState(), id));
-    target.classList.add('is-flipped');
-
-    if (!getState().isLocked && getState().flippedCards.length === 0) {
-      handleMatch(prevFlipped, id);
-    } else if (getState().isLocked) {
-      handleMismatch();
-    } else {
-      updateHeader();
-    }
+    if (!getState().isLocked) resolveFlip(target, getState, setState, handleMatch, handleMismatch, updateHeader);
   });
 }
 
@@ -268,51 +324,17 @@ function attachCardClickHandler(
  * @param onExit - Callback invoked when the player confirms exiting via the modal
  * @returns The fully mounted game screen `HTMLElement`
  */
-export function renderGameScreen(
-  initialState: GameState,
-  onGameOver: (state: GameState) => void,
-  onExit: () => void
-): HTMLElement {
+export function renderGameScreen(initialState: GameState, onGameOver: (state: GameState) => void, onExit: () => void): HTMLElement {
   let state = initialState;
   const isGaming = state.settings.theme === 'gaming';
   const { el, headerWrap, boardWrap } = createScreenElements(state);
-
-  const cardEl = (id: number): HTMLElement =>
-    boardWrap.querySelector<HTMLElement>(`.card[data-id="${id}"]`)!;
-
-  const updateHeader = (): void => {
-    headerWrap.innerHTML = buildHeader(state, isGaming);
-    headerWrap.querySelector('#btn-exit')!.addEventListener('click', () => showExitModal(isGaming, onExit));
-  };
-
-  const handleMatch = (prevFlipped: number[], id: number): void => {
-    setTimeout(() => {
-      [prevFlipped[0], id].forEach((mid) => cardEl(mid).classList.add('is-matched'));
-      updateHeader();
-      if (isGameOver(state)) setTimeout(() => onGameOver(state), GAMEOVER_DELAY_MS);
-    }, MATCH_DELAY_MS);
-  };
-
-  const handleMismatch = (): void => {
-    updateHeader();
-    setTimeout(() => {
-      const [firstId, secondId] = state.flippedCards;
-      state = unflipCards(state);
-      cardEl(firstId).classList.remove('is-flipped');
-      cardEl(secondId).classList.remove('is-flipped');
-      updateHeader();
-    }, UNMATCH_DELAY_MS);
-  };
-
-  attachCardClickHandler(
-    boardWrap,
-    () => state,
-    (s) => { state = s; },
-    handleMatch,
-    handleMismatch,
-    updateHeader
-  );
-
+  const getState = (): GameState => state;
+  const setState = (s: GameState): void => { state = s; };
+  const cardEl = (id: number): HTMLElement => boardWrap.querySelector<HTMLElement>(`.card[data-id="${id}"]`)!;
+  const updateHeader = makeUpdateHeader(headerWrap, getState, isGaming, onExit);
+  const handleMatch = makeHandleMatch(getState, cardEl, updateHeader, onGameOver);
+  const handleMismatch = makeHandleMismatch(getState, setState, cardEl, updateHeader);
+  attachCardClickHandler(boardWrap, getState, setState, handleMatch, handleMismatch, updateHeader);
   updateHeader();
   return el;
 }

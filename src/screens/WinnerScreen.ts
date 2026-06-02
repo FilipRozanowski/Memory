@@ -93,15 +93,10 @@ export function renderWinnerScreen(state: GameState, onRestart: () => void): HTM
   const result = getWinner(state);
   const isGaming = state.settings.theme === 'gaming';
   const isDraw = result === 'draw';
-
-  const el = document.createElement('div');
+  const el = document.createElement('main');
   el.className = 'screen-winner';
   el.innerHTML = isDraw ? buildDrawHtml(isGaming) : buildWinnerHtml(result as Player, isGaming);
-
-  if (!isDraw) {
-    startConfetti(el.querySelector<HTMLCanvasElement>('#confetti-canvas')!);
-  }
-
+  if (!isDraw) startConfetti(el.querySelector<HTMLCanvasElement>('#confetti-canvas')!);
   el.querySelector('#btn-restart')!.addEventListener('click', onRestart);
   return el;
 }
@@ -151,6 +146,20 @@ function drawConfettiFrame(ctx: CanvasRenderingContext2D, pieces: ConfettiPiece[
 }
 
 /**
+ * Attaches a one-time click listener that cancels the confetti animation frame.
+ *
+ * @param canvas - The confetti canvas whose parent screen receives the click
+ * @param getRaf - Returns the current `requestAnimationFrame` handle to cancel
+ */
+function stopOnClick(canvas: HTMLCanvasElement, getRaf: () => number): void {
+  canvas.closest('.screen-winner')?.addEventListener(
+    'click',
+    () => cancelAnimationFrame(getRaf()),
+    { once: true }
+  );
+}
+
+/**
  * Starts the confetti animation loop on the given canvas and stops it on the next click.
  *
  * @param canvas - The `<canvas>` element on which to draw the confetti
@@ -161,17 +170,7 @@ function startConfetti(canvas: HTMLCanvasElement): void {
   const H = (canvas.height = CONFETTI_HEIGHT);
   const pieces = createConfettiPieces(CONFETTI_COUNT, W, H);
   let raf: number;
-
-  const loop = (): void => {
-    drawConfettiFrame(ctx, pieces, W, H);
-    raf = requestAnimationFrame(loop);
-  };
-
+  const loop = (): void => { drawConfettiFrame(ctx, pieces, W, H); raf = requestAnimationFrame(loop); };
   loop();
-
-  canvas.closest('.screen-winner')?.addEventListener(
-    'click',
-    () => cancelAnimationFrame(raf),
-    { once: true }
-  );
+  stopOnClick(canvas, () => raf);
 }
